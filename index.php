@@ -311,6 +311,40 @@ $db->close();
 
     </div>
     <hr id="kontak"class="featurette-divider">
+
+    <h2><b>Komentar mereka :</b></h2>
+    <div class="grid-container">
+    <?php
+    $no_wa = 6282266479716;
+    ?>
+
+    <!-- Link WhatsApp dengan gambar ikon -->
+    <a href="https://wa.me/<?php echo $no_wa ?>?text=halo saya ingin bertanya" target="_blank">
+        <img src="pic/wa.png" alt="WhatsApp" style="width: 50px; height: 50px; vertical-align:middle;"> 
+    </a>
+    
+    <br>
+    <?php
+    $judul = "Nama Pekerjaan";
+    $lokasi = "Jakarta";
+    $mailto_link = "mailto:" . "lookwork@lkwrk.co" . "?subject=Job%20Application%20for%20" . urlencode($judul) .
+        "&body=Dear%20Employer,%0A%0AI%20am%20interested%20in%20applying%20for%20the%20position%20of%20" .
+        urlencode($judul) . "%20located%20in%20" . urlencode($lokasi) . ".%0A%0AThank%20you.";
+    ?>
+
+    <!-- Link mailto dengan gambar ikon email -->
+    <a href="<?php echo $mailto_link ?>" class="btn-apply">
+        <img src="pic/email.jpg" alt="Email" style="width: 50px; height: 50px; vertical-align:middle;">
+    </a>
+
+    <br>
+    <!-- Link Instagram dengan gambar ikon Instagram -->
+    <a href="https://www.instagram.com/lookwork__/" target="_blank">
+        <img src="pic/ig.png" alt="Instagram" style="width: 50px; height: 50px; vertical-align:middle;">
+    </a>
+</div>
+
+    <hr id="kontak"class="featurette-divider">
     <h2><b>Kontak Kami</b></h2>
     <div class="grid-container">
     <?php

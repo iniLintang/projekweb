@@ -45,11 +45,12 @@
                         </a>
                     </li>
                     <li class="sidebar-dropdown-menu-item">
-                        <a href="data-perusahaan.php">
-                        <i class="ri-building-line"></i>
-                            Perusahaan
-                        </a>
-                    </li>
+                    <a href="data-perusahaan.php">
+                        <i class="ri-building-line"></i> <!-- Pastikan Anda memiliki ikon dari `remixicon` atau pustaka ikon yang benar -->
+                        Perusahaan
+                    </a>
+                </li>
+
                     <li class="sidebar-dropdown-menu-item">
                         <a href="#">
                         <i class="ri-user-3-line"></i>
