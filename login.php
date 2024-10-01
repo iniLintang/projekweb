@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $admin = $result->fetch_assoc();
         if ($password == $admin['password']) { // Plain text comparison
             $_SESSION['admin_id'] = $admin['admin_id'];
-            header('Location: adm.php');
+            header('Location: html/index.php');
             eAxit();
         } else {
             $error = "Invalid password for admin.";
