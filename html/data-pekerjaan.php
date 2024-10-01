@@ -83,13 +83,13 @@ $result = $conn->query($sql);
                 </a>
                 <ul class="sidebar-dropdown-menu">
                     <li class="sidebar-dropdown-menu-item">
-                        <a href="#">
+                        <a href="data-pekerjaan.php">
                         <i class="ri-briefcase-line"></i>
                             Pekerjaan
                         </a>
                     </li>
                     <li class="sidebar-dropdown-menu-item">
-                        <a href="#">
+                        <a href="data-perusahaan.php">
                         <i class="ri-building-line"></i>
                             Perusahaan
                         </a>
