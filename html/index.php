@@ -45,7 +45,7 @@
                         </a>
                     </li>
                     <li class="sidebar-dropdown-menu-item">
-                        <a href="#">
+                        <a href="data-perusahaan.php">
                         <i class="ri-building-line"></i>
                             Perusahaan
                         </a>
