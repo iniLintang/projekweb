@@ -142,42 +142,45 @@ $result = $conn->query($sql);
                         </div>
                     </form>
 
+                    
                     <!-- Form Tambah Data Pekerjaan -->
-                    <div id="formTambah" class="card p-4 mb-4" style="display: none;">
-                        <h5 class="card-title">Form Tambah Data Pekerjaan</h5>
-                        <form method="POST" action="">
-                            <div class="form-group">
-                                <label>Company ID</label>
-                                <input type="text" name="company_id" class="form-control" value="<?php echo $companies; ?>" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label>Job Title</label>
-                                <input type="text" name="job_title" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Job Description</label>
-                                <textarea name="job_description" class="form-control" required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Location</label>
-                                <input type="text" name="location" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Salary Range</label>
-                                <input type="text" name="salary_range" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Job Type</label>
-                                <select name="job_type" class="form-control" required>
-                                    <option value="Full-Time">Full-Time</option>
-                                    <option value="Part-Time">Part-Time</option>
-                                    <option value="Contract">Contract</option>
-                                    <option value="Internship">Internship</option>
-                                </select>
-                            </div>
-                            <button type="submit" name="create" class="btn btn-success mt-3">Simpan Pekerjaan</button>
-                        </form>
-                    </div>
+<div id="formTambah" class="card p-4 mb-4">
+    <h5 class="card-title">Form Tambah Data Pekerjaan</h5>
+    <form method="POST" action="">
+        <div class="form-group">
+            <label>Company ID</label>
+            <input type="text" name="company_id" class="form-control" value="<?php echo htmlspecialchars($company_id); ?>" readonly>
+
+        <div class="form-group">
+            <label>Job Title</label>
+            <input type="text" name="job_title" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Job Description</label>
+            <textarea name="job_description" class="form-control" required></textarea>
+        </div>
+        <div class="form-group">
+            <label>Location</label>
+            <input type="text" name="location" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Salary Range</label>
+            <input type="text" name="salary_range" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Job Type</label>
+            <select name="job_type" class="form-control" required>
+                <option value="Full-Time">Full-Time</option>
+                <option value="Part-Time">Part-Time</option>
+                <option value="Contract">Contract</option>
+                <option value="Internship">Internship</option>
+            </select>
+        </div>
+        <button type="submit" name="create" class="btn btn-success mt-3">Simpan Pekerjaan</button>
+    </form>
+</div>
+
+
 
                     <!-- Tabel Data Pekerjaan -->
                     <div class="table-responsive">
