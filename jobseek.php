@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!doctype html>
     <html lang="en" data-bs-theme="auto">
       <head><script src="../assets/js/color-modes.js"></script>
@@ -19,6 +22,7 @@
 
 
         <style>
+
           .bd-placeholder-img {
             font-size: 1.125rem;
             text-anchor: middle;
@@ -95,6 +99,36 @@
           .bd-mode-toggle .dropdown-menu .active .bi {
             display: block !important;
           }
+
+          form {
+    display: flex;
+    flex-wrap: wrap; /* Agar elemen otomatis turun ke baris baru jika ruang tidak cukup */
+    gap: 10px;
+    max-width: 800px; /* Lebar maksimum form */
+    margin: auto;
+    justify-content: space-between; /* Mengatur jarak antar elemen */
+    align-items: center; /* Menjaga elemen agar sejajar secara vertikal */
+}
+
+input[type="text"],
+select {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    flex: 1; /* Membuat input dan select menyesuaikan lebar */
+    min-width: 200px; /* Lebar minimum agar tidak terlalu kecil */
+}
+
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+select, input[type="text"] {
+    background-color: #fff;
+}
+
         </style>
 
         
@@ -104,83 +138,72 @@
       <body>
 
         
-    <header data-bs-theme="dark">
-    <nav class="navbar navbar-expand-md fixed-top">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="#"><B>LookWork</B></a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav me-auto mb-2 mb-md-0">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="index.php#">Beranda</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="index.php#tentang">Tentang</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="index.php#services">LookWork</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="index.php#comp">Profile Perusahaan</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="index.php#kontak">Kontak</a>
-              </li>
+      <header data-bs-theme="dark">
+          <nav class="navbar navbar-expand-md fixed-top">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="#">LookWork</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="index.php#">Beranda</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="index.php#tentang">Tentang</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="index.php#services">LookWork</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="index.php#comp">Profile Perusahaan</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="index.php#kontak">Kontak</a>
+                  </li>
+                  <?php
+                  if (isset($_SESSION['username'])) {
+                      echo ' <a class="nav-link" href="index.php#kontak">Notifikasi</a>';
+                  } else {
+                      echo '<a class="nav-link" href="index.php#kontak"></a>';
+                  } 
+                  ?>
+                </ul>
 
-            </ul>
-            <form class="d-flex" role="search">
-            <a class="nav-link" href="login.php">Login</a>
-            </form>
-          </div>
+                <form class="d-flex" role="search">
+                  <?php if (isset($_SESSION['username'])): ?>
+                    <!-- Jika user sudah login, tampilkan dropdown -->
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <?php echo $_SESSION['username']; ?> <!-- Menampilkan username -->
+                      </button>
+                      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+                        <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                      </ul>
+                    </div>
+                  <?php else: ?>
+                    <!-- Jika user belum login, tampilkan link Login -->
+                    <a class="nav-link" href="login.php">Login</a>
+                  <?php endif; ?>
+                </form>
+              </div>
+            </div>
+          </nav>
+
         </div>
       </nav>
+    </header>
 
-    <main>
-    <div id="myCarousel" class="carousel slide mb-6" data-bs-ride="carousel">
-      <div class="carousel-item active">
-      <img src="pic/BANNER1.png" class="d-block w-100" alt="First Slide">
-      <div class="container">
-        <div class="carousel-caption text-start">
-          <h1>Headline 1</h1>
-          <p>Deskripsi untuk slide pertama</p>
-          <p><a class="btn btn-lg btn-primary" href="#">Sign up today</a></p>
-        </div>
-      </div>
-    </div>
-    <div class="carousel-item">
-      <img src="pic/LOOKWORK.jpg" class="d-block w-100" alt="Second Slide">
-      <div class="container">
-        <div class="carousel-caption">
-          <h1>Headline 2</h1>
-          <p>Deskripsi untuk slide kedua</p>
-          <p><a class="btn btn-lg btn-primary" href="#">Learn more</a></p>
-        </div>
-      </div>
-    </div>
-    <div class="carousel-item">
-      <img src="pic/BANNER3.png" class="d-block w-100" alt="Third Slide">
-      <div class="container">
-        <div class="carousel-caption">
-          <h1>Headline 3</h1>
-          <p>Deskripsi untuk slide ketiga</p>
-          <p><a class="btn btn-lg btn-primary" href="#">Learn more</a></p>
-        </div>
-      </div>
-    </div>
-      </div>
+   
       <!-- Marketing messaging and featurettes
       ================================================== -->
       <!-- Wrap the rest of the page in another container to center all the content. -->
 
       <hr class="featurette-divider">
 
-      <div class="container marketing">
-      <form class="d-flex mb-4" role="search" action="jobseek.php" method="GET">
-     <input class="form-control me-2" type="search" name="search" placeholder="Cari pekerjaan atau perusahaan..." aria-label="Search" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
-     <button class="btn btn-outline-success" type="submit">Search</button>
-     </form>
+      <div class="container fluid">
 
 
         <!-- START THE FEATURETTES -->
@@ -188,68 +211,129 @@
         <div id="tentang" class="row featurette">
 
         <section id="services" class="services-section">
-            <h2><b>LookWork</b></h2>
-            <main class="container mt-5">
+    <h2><b>LookWork</b></h2>
+    <main class="container mt-5">
+        <form method="GET" action="">
+            <!-- Input Pencarian -->
+            <input type="text" name="search" placeholder="Cari pekerjaan atau perusahaan" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
+
+            <!-- Combo Box untuk Rentang Gaji -->
+            <select name="salary_range">
+                <option value="">Pilih Rentang Gaji</option>
+                <?php
+                include 'koneksi.php';
+
+                // Query untuk mengambil rentang gaji unik dari tabel pekerjaan
+                $sql_salary = "SELECT DISTINCT salary_range FROM jobs";
+                $result_salary = $db->query($sql_salary);
+
+                if ($result_salary->num_rows > 0) {
+                    while ($row_salary = $result_salary->fetch_assoc()) {
+                        $salary_range = $row_salary['salary_range'];
+                        echo "<option value='$salary_range'>" . format_salary_range($salary_range) . "</option>";
+                    }
+                }
+
+                function format_salary_range($salary_range) {
+                    // Fungsi untuk memformat rentang gaji dari database ke dalam format Rupiah
+                    $gaji_parts = explode('-', $salary_range);
+                    $gaji_min = isset($gaji_parts[0]) ? floatval(preg_replace("/[^0-9]/", "", $gaji_parts[0])) : 0;
+                    $gaji_max = isset($gaji_parts[1]) ? floatval(preg_replace("/[^0-9]/", "", $gaji_parts[1])) : 0;
+                    $gaji_min_formatted = "Rp " . number_format($gaji_min, 0, ',', '.');
+                    $gaji_max_formatted = "Rp " . number_format($gaji_max, 0, ',', '.');
+                    return $gaji_min_formatted . ' - ' . $gaji_max_formatted;
+                }
+                ?>
+            </select>
+
+            <!-- Combo Box untuk Kota -->
+            <select name="location">
+                <option value="">Pilih Kota</option>
+                <?php
+                // Query untuk mengambil daftar kota unik dari tabel pekerjaan
+                $sql_location = "SELECT DISTINCT location FROM jobs";
+                $result_location = $db->query($sql_location);
+
+                if ($result_location->num_rows > 0) {
+                    while ($row_location = $result_location->fetch_assoc()) {
+                        $location = $row_location['location'];
+                        echo "<option value='$location'>$location</option>";
+                    }
+                }
+                ?>
+            </select>
+
+            <button type="submit"   class='btn btn-apply' >Cari</button>
+        </form>
+
         <div class="grid-container">
         <?php
-include 'koneksi.php';
-
-// Ambil kata kunci dari parameter GET jika ada
+// Ambil parameter pencarian
 $search = isset($_GET['search']) ? $_GET['search'] : '';
+$salary_range = isset($_GET['salary_range']) ? $_GET['salary_range'] : '';
+$location = isset($_GET['location']) ? $_GET['location'] : '';
 
-// Modifikasi query untuk pencarian pekerjaan berdasarkan job title atau nama perusahaan
+// Query dasar untuk mengambil data pekerjaan
 $sql = "SELECT jobs.*, companies.company_name, companies.contact_email 
         FROM jobs 
-        LEFT JOIN companies ON jobs.company_id = companies.company_id";
+        LEFT JOIN companies ON jobs.company_id = companies.company_id WHERE 1=1";
 
-// Tambahkan klausa WHERE jika ada pencarian
+// Tambahkan klausa WHERE untuk pencarian kata kunci
 if ($search) {
-    $sql .= " WHERE jobs.job_title LIKE '%$search%' OR companies.company_name LIKE '%$search%'";
+    $sql .= " AND (jobs.job_title LIKE '%$search%' OR companies.company_name LIKE '%$search%')";
+}
+
+// Tambahkan filter berdasarkan rentang gaji
+if ($salary_range) {
+    $gaji_parts = explode('-', $salary_range);
+    $gaji_min = floatval($gaji_parts[0]);
+    $gaji_max = floatval($gaji_parts[1]);
+    
+    // Ubah rentang gaji dari database ke angka tanpa simbol dan tambahkan ke query
+    $sql .= " AND (
+        CAST(REPLACE(SUBSTRING_INDEX(jobs.salary_range, '-', 1), '.', '') AS UNSIGNED) >= $gaji_min
+        AND CAST(REPLACE(SUBSTRING_INDEX(jobs.salary_range, '-', -1), '.', '') AS UNSIGNED) <= $gaji_max
+    )";
+}
+
+// Tambahkan filter berdasarkan kota
+if ($location) {
+    $sql .= " AND jobs.location = '$location'";
 }
 
 $result = $db->query($sql);
 
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        // Mengisi variabel dengan validasi jika data ada
         $judul = isset($row['job_title']) ? $row['job_title'] : 'Tidak ada judul';
-        $comp = isset($row['company_name']) ? $row['company_name'] : 'Tidak ada perusahaan';  // Nama perusahaan
+        $comp = isset($row['company_name']) ? $row['company_name'] : 'Tidak ada perusahaan';
         $deskripsi = isset($row['job_description']) ? $row['job_description'] : 'Tidak ada deskripsi';
         $lokasi = isset($row['location']) ? $row['location'] : 'Tidak ada lokasi';
 
-        // Hapus simbol non-numerik dari gaji dan ubah format ke Rupiah
-        $gaji_raw = isset($row['salary_range']) ? $row['salary_range'] : '0-0';  // Rentang gaji
-        $gaji_parts = explode('-', $gaji_raw);  // Pisahkan gaji minimal dan maksimal
-
-        // Memastikan ada minimal dan maksimal gaji
+        // Proses gaji
+        $gaji_raw = isset($row['salary_range']) ? $row['salary_range'] : '0-0';
+        $gaji_parts = explode('-', $gaji_raw);
         $gaji_min = isset($gaji_parts[0]) ? floatval(preg_replace("/[^0-9]/", "", $gaji_parts[0])) : 0;
         $gaji_max = isset($gaji_parts[1]) ? floatval(preg_replace("/[^0-9]/", "", $gaji_parts[1])) : 0;
-
-        // Format gaji menjadi Rupiah
         $gaji_min_formatted = "Rp " . number_format($gaji_min, 0, ',', '.');
         $gaji_max_formatted = "Rp " . number_format($gaji_max, 0, ',', '.');
-
-        // Gabungkan gaji minimum dan maksimum dalam satu string
         $gaji = $gaji_min_formatted . ' - ' . $gaji_max_formatted;
 
         $persyaratan = isset($row['job_type']) ? $row['job_type'] : 'Tidak ada tipe';
-        $employer_email = isset($row['contact_email']) ? $row['contact_email'] : 'Tidak ada email';  // Email perusahaan
+        $employer_email = isset($row['contact_email']) ? $row['contact_email'] : 'Tidak ada email';
 
-        // Menampilkan data pekerjaan
+        // Tampilkan data pekerjaan
         echo "<div class='grid-item'>";
-        echo "<h5>" . $judul . "</h5>";  // Judul pekerjaan
-        echo "<p><strong>Perusahaan:</strong> " . $comp . "</p>";  // Nama perusahaan
-        echo "<p><strong>Lokasi:</strong> " . $lokasi . "</p>";  // Lokasi pekerjaan
-        echo "<p><strong>Gaji:</strong> " . $gaji . "</p>";  // Gaji dengan format Rupiah
-        echo "<p><strong>Deskripsi:</strong> " . $deskripsi . "</p>";  // Deskripsi pekerjaan
-        echo "<p><strong>Persyaratan:</strong> " . $persyaratan . "</p>";  // Persyaratan pekerjaan
+        echo "<h5>" . $judul . "</h5>";
+        echo "<p><strong>Perusahaan:</strong> " . $comp . "</p>";
+        echo "<p><strong>Lokasi:</strong> " . $lokasi . "</p>";
+        echo "<p><strong>Gaji:</strong> " . $gaji . "</p>";
+        echo "<p><strong>Deskripsi:</strong> " . $deskripsi . "</p>";
+        echo "<p><strong>Persyaratan:</strong> " . $persyaratan . "</p>";
 
-        // Membuat mailto link dinamis untuk apply job
         $mailto_link = "mailto:" . $employer_email . "?subject=Job%20Application%20for%20" . urlencode($judul) .
         "&body=Dear%20Employer,%0A%0AI%20am%20interested%20in%20applying%20for%20the%20position%20of%20" .
         urlencode($judul) . "%20located%20in%20" . urlencode($lokasi) . ".%0A%0AThank%20you.";
-
-        // Menampilkan tombol Apply yang membuka mailto
         echo "<a href='" . $mailto_link . "' class='btn-apply'>Apply for Job</a>";
         echo "</div>";
     }
@@ -261,8 +345,8 @@ $db->close();
 ?>
 
         </div>
-        </main> 
-        </section>
+    </main>
+</section>
         <!-- /END THE FEATURETTES -->
 
       </div><!-- /.container -->

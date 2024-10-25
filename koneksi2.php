@@ -2,7 +2,7 @@
 $server = "localhost";
 $user = "root";
 $password = "";
-$nama_database = "lookwork"; // Adjusted name if needed
+$nama_database = "lookwork2"; // Adjusted name if needed
 
 // Establish connection
 $db = mysqli_connect($server, $user, $password, $nama_database);

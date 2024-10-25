@@ -1,6 +1,10 @@
 <?php
 include('db.php');
+session_start();
 
+if (isset($_SESSION['username'])) {
+    $adminName = $_SESSION['username']; // You can use 'admin_username' if you prefer username
+} 
 // CREATE Logic (Menambahkan data perusahaan)
 if (isset($_POST['create'])) {
     $company_name = $_POST['company_name'];
@@ -11,7 +15,7 @@ if (isset($_POST['create'])) {
             VALUES ('$company_name', '$company_description', '$contact_email')";
     
     if ($conn->query($sql) === TRUE) {
-        header("Location: index.php");
+        header("Location: data-perusahaan.php");
         exit; // Pastikan untuk menghentikan skrip setelah pengalihan
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
@@ -24,7 +28,7 @@ if (isset($_GET['delete_id'])) {
     $sql = "DELETE FROM companies WHERE company_id = $company_id";
 
     if ($conn->query($sql) === TRUE) {
-        header("Location: index.php");
+        header("Location: data-perusahaan.php");
         exit; // Pastikan untuk menghentikan skrip setelah pengalihan
     } else {
         echo "Error deleting record: " . $conn->error;
@@ -92,8 +96,8 @@ $result = $conn->query($sql);
                         </a>
                     </li>
                     <li class="sidebar-dropdown-menu-item">
-                        <a href="#">
-                        <i class="ri-user-3-line"></i>
+                    <a href="data-user.php">
+                    <i class="ri-user-3-line"></i>
                             Pengguna
                         </a>
                 </ul>
@@ -105,7 +109,7 @@ $result = $conn->query($sql);
                 </a>
             </li>
             <li class="sidebar-menu-item">
-                <a href="#">
+                <a href="logout.php">
                 <i class="ri-logout-box-line sidebar-menu-item-icon"></i>
                     Logout
                 </a>
@@ -122,15 +126,10 @@ $result = $conn->query($sql);
                             aria-expanded="false">
                         </div>
                         <div class="dropdown">
-                            <div class="d-flex align-items-center cursor-pointer dropdown-toggle" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                <span class="me-2 d-none d-sm-block">Welcome, Lintang Raina</span>
-                            </div>
+                        <div namaadm>
+                        <div>Welcome, <?php echo htmlspecialchars($adminName); ?>!</div>
+                        </div>
                 </nav>
-
-                <div class="container mt-3">
-                    <button class="btn btn-primary mb-2" onclick="toggleForm()">Tambah Data</button>
-
                     <!-- Form Pencarian -->
                     <form method="POST" action="" class="mb-3">
                         <div class="input-group">
@@ -138,28 +137,43 @@ $result = $conn->query($sql);
                             <button class="btn btn-outline-secondary" type="submit">Cari</button>
                         </div>
                     </form>
+   <!-- Tombol Tambah Perusahaan -->
+   <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addCompaniesModal">
+    Tambah Perusahaan
+</button>
 
-                    <!-- Form Tambah Data Perusahaan -->
-                    <div id="formTambah" class="card p-4 mb-4" style="display: none;">
-                        <h5 class="card-title">Form Tambah Data Perusahaan</h5>
-                        <form method="POST" action="">
-                            <div class="form-group">
-                                <label>Company Name</label>
-                                <input type="text" name="company_name" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Company Description</label>
-                                <textarea name="company_description" class="form-control" required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Contact Email</label>
-                                <input type="email" name="contact_email" class="form-control" required>
-                            </div>
-                            <button type="submit" name="create" class="btn btn-success mt-3">Simpan Perusahaan</button>
-                        </form>
+<!-- Modal untuk Tambah Perusahaan -->
+<div class="modal fade" id="addCompaniesModal" tabindex="-1" aria-labelledby="addCOmpaniesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addJobModalLabel">Tambah PePerusahaan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="company_name" class="form-label">Nama Perusahaan</label>
+                        <input type="text" class="form-control" id="company_name" name="company_name" required>
                     </div>
-
-                    <!-- Tabel Data Perusahaan -->
+                    <div class="mb-3">
+                        <label for="company_description" class="form-label">Deskripsi Perusahaan</label>
+                        <textarea class="form-control" id="company_description" name="company_description" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contact_email" class="form-label">Kontak Email</label>
+                        <input type="text" class="form-control" id="contact_email" name="contact_email" required>
+                    </div>
+</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-primary" name="create">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+                   <!-- Tabel Data Perusahaan -->
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
@@ -170,42 +184,35 @@ $result = $conn->query($sql);
                                     <th>Contact Email</th>
                                     <th>Created At</th>
                                     <th>Aksi</th>
-                                </tr>
-                            </thead>
+                                    </tr>
+                                </thead>
                             <tbody>
-                                <?php
-                                // Menampilkan data perusahaan setelah pencarian
-                                if ($result->num_rows > 0) {
-                                    // Looping setiap baris data perusahaan
-                                    while ($row = $result->fetch_assoc()) {
-                                        echo "<tr>
-                                            <td>" . htmlspecialchars($row['company_id']) . "</td>
-                                            <td>" . htmlspecialchars($row['company_name']) . "</td>
-                                            <td>" . htmlspecialchars($row['company_description']) . "</td>
-                                            <td>" . htmlspecialchars($row['contact_email']) . "</td>
-                                            <td>" . htmlspecialchars($row['created_at']) . "</td>
-                                            <td>
-                                                <a href='update.php?id=" . $row['company_id'] . "' class='btn btn-warning btn-sm'>
-                                                    <i class='ri-edit-line'></i>
-                                                </a>
-                                                <a href='?delete_id=" . $row['company_id'] . "' class='btn btn-danger btn-sm' onclick='return confirm(\"Yakin ingin menghapus data ini?\")'>
-                                                    <i class='ri-delete-bin-line'></i>
-                                                </a>
-                                            </td>
-                                        </tr>";
-                                    }
-                                } else {
-                                    // Jika tidak ada data
-                                    echo "<tr><td colspan='6'>Tidak ada data</td></tr>";
-                                }
-                                ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </main>
-
+                    <?php
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            echo "<tr>
+                                <td>" . htmlspecialchars($row['company_id']) . "</td>
+                                <td>" . htmlspecialchars($row['company_name']) . "</td>
+                                <td>" . htmlspecialchars($row['company_description']) . "</td>
+                                <td>" . htmlspecialchars($row['contact_email']) . "</td>
+                                <td>" . htmlspecialchars($row['created_at']) . "</td>
+                                <td>
+                                        <a href='profile.php?id=" . $row['company_id'] . "' class='btn btn-warning btn-sm'>
+                                        <i class='ri-eye-line'></i>
+                                    </a>
+                                    <a href='?delete_id=" . $row['company_id'] . "' class='btn btn-danger btn-sm' onclick='event.stopPropagation(); return confirm(\"Yakin ingin menghapus data ini?\");'>
+                                        <i class='ri-delete-bin-line'></i> 
+                                    </a>
+                                </td>
+                            </tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='6'>Tidak ada data</td></tr>";
+                    }
+           ?>
+         </tbody>
+    </table>
+</div>
         <script src="../assets/js/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"
             integrity="sha512-sW/w8s4RWTdFFSduOTGtk4isV1+190E/GghVffMA9XczdJ2MDzSzLEubKAs5h0wzgSJOQTRYyaz73L3d6RtJSg=="
@@ -213,13 +220,13 @@ $result = $conn->query($sql);
         <script src="../assets/js/bootstrap.bundle.min.js"></script>
         <script src="../assets/js/script.js"></script>
         <script>
-            function toggleForm() {
-                var form = document.getElementById('formTambah');
-                if (form.style.display === 'none') {
-                    form.style.display = 'block';
-                } else {
-                    form.style.display = 'none';
-                }
+         function clearSearch() {
+                // Menghapus isi input pencarian
+                document.getElementById("searchInput").value = "";
+                // Menghapus nilai search_query
+                document.forms[0].search.value = "";
+                // Menyegarkan halaman untuk mengupdate tampilan data
+                document.forms[0].submit();
             }
         </script>
 </body>

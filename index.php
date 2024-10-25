@@ -1,22 +1,23 @@
+<?php
+session_start();
+?>
     <!doctype html>
     <html lang="en" data-bs-theme="auto">
       <head><script src="../assets/js/color-modes.js"></script>
 
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="">
-        <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-        <meta name="generator" content="Hugo 0.122.0">
-        <title>LookWork.co</title>
+      <script src="../assets/js/color-modes.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.122.0">
+    <title>LookWork.co</title>
 
-        <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/carousel/">
-
-        
-
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
-
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/carousel/">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link href="../projekweb/assets/dist/css/bootstrap.min.css" rel="stylesheet">
-
+       
 
         <style>
           .bd-placeholder-img {
@@ -95,6 +96,47 @@
           .bd-mode-toggle .dropdown-menu .active .bi {
             display: block !important;
           }
+
+          .comment-form form {
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .comment-form label {
+            display: block;
+            margin-top: 10px;
+        }
+        .comment-form input, .comment-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .comment-form button {
+            margin-top: 15px;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .comment-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .sosial-media {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .sosial-media-link {
+        margin: 10px;
+    }
+        
         </style>
 
         
@@ -105,64 +147,88 @@
 
         
     <header data-bs-theme="dark">
-      <nav class="navbar navbar-expand-md fixed-top">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="#"><B>LookWork</B></a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav me-auto mb-2 mb-md-0">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Beranda</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#tentang">Tentang</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#services">LookWork</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#comp">Profile Perusahaan</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#kontak">Kontak</a>
-              </li>
+          <nav class="navbar navbar-expand-md fixed-top">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="#">LookWork</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="index.php#">Beranda</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="index.php#tentang">Tentang</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="index.php#services">LookWork</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="index.php#comp">Profile Perusahaan</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="index.php#kontak">Kontak</a>
+                  </li>
+                  <?php
+                  if (isset($_SESSION['username'])) {
+                      echo ' <a class="nav-link" href="index.php#kontak">Notifikasi</a>';
+                  } else {
+                      echo '<a class="nav-link" href="index.php#kontak"></a>';
+                  } 
+                  ?>
+                </ul>
 
-            </ul>
-            <form class="d-flex" role="search">
-            <a class="nav-link" href="login.php">Login</a>
-            </form>
-          </div>
+                <form class="d-flex ml-auto" role="search" method="get" action="search.php"> <!-- Specify action and method -->
+            <?php if (isset($_SESSION['username'])): ?>
+                <!-- Jika user sudah login, tampilkan dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <?php echo htmlspecialchars($_SESSION['username']); ?> <!-- Menampilkan username -->
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+                        <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                    </ul>
+                </div>
+            <?php else: ?>
+                <!-- Jika user belum login, tampilkan link Login -->
+                <a class="nav-link" href="login.php">Login</a>
+            <?php endif; ?>
+        </form>
+              </div>
+            </div>
+          </nav>
+
         </div>
       </nav>
     </header>
 
     <main>
-
+      <br><br>
       <div id="myCarousel" class="carousel slide mb-6" data-bs-ride="carousel">
       <div class="carousel-item active">
-      <img src="pic/BANNER1.png" class="d-block w-100" alt="First Slide">
+      <img src="pic/baner1.png" class="d-block w-100" alt="First Slide">
       <div class="container">
         <div class="carousel-caption text-start">
-          <h1>Headline 1</h1>
-          <p>Deskripsi untuk slide pertama</p>
-          <p><a class="btn btn-lg btn-primary" href="#">Sign up today</a></p>
+          <h1>sign up Lookwork</h1>
+          <p>Sign Up untuk meraih cita-cita anda</p>
+          <p><a class="btn btn-lg btn-primary" href="login.php">Sign up today</a></p>
         </div>
       </div>
     </div>
     <div class="carousel-item">
-      <img src="pic/LOOKWORK.jpg" class="d-block w-100" alt="Second Slide">
+      <img src="pic/banner2.jpg" class="d-block w-100" alt="Second Slide">
       <div class="container">
         <div class="carousel-caption">
           <h1>Headline 2</h1>
-          <p>Deskripsi untuk slide kedua</p>
-          <p><a class="btn btn-lg btn-primary" href="#">Learn more</a></p>
+          <p>ingin mengetahui lebih lanjut tentang LookWork?</p>
+          <p><a class="btn btn-lg btn-primary" href="#tentang">Learn more</a></p>
         </div>
       </div>
     </div>
     <div class="carousel-item">
-      <img src="pic/BANNER3.png" class="d-block w-100" alt="Third Slide">
+      <img src="pic/banner3.jpg" class="d-block w-100" alt="Third Slide">
       <div class="container">
         <div class="carousel-caption">
           <h1>Headline 3</h1>
@@ -171,6 +237,7 @@
         </div>
       </div>
     </div>
+    
       </div>
 
 
@@ -183,32 +250,45 @@
 
         <!-- START THE FEATURETTES -->
 
-        <div id="tentang" class="row featurette">
-          <div class="col-md-7">
-            <h2 class="featurette-heading fw-normal lh-1"><b>Tentang Web</b> </h2>
-            <p class="lead">LookWork adalah platform terpercaya yang mempermudah Anda menemukan pekerjaan impian atau 
-            membuka peluang karir bagi orang lain. Dengan kemudahan navigasi dan fitur unggulan, 
-            LookWork menghubungkan pencari kerja dengan perusahaan yang tepat, memastikan proses rekrutmen yang efisien dan tepat sasaran. 
-            Tingkatkan kesempatan Anda untuk sukses dengan LookWork, tempat di mana karir dimulai dan talenta terbaik ditemukan.</p>
-          </div>
-          <div class="col-md-5">
-            <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-bg)"/><text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">500x500</text></svg>
-          </div>
-        </div>
+        <div id="tentang" class="row featurette" data-aos="fade-up" data-aos-duration="3000">
+  <div class="col-md-7" >
+    <h2 class="featurette-heading fw-normal lh-1"><b>Tentang Web</b></h2>
+    <p class="lead">LookWork adalah platform terpercaya yang mempermudah Anda menemukan pekerjaan impian atau 
+      membuka peluang karir bagi orang lain. Dengan kemudahan navigasi dan fitur unggulan, 
+      LookWork menghubungkan pencari kerja dengan perusahaan yang tepat, memastikan proses rekrutmen yang efisien dan tepat sasaran. 
+      Tingkatkan kesempatan Anda untuk sukses dengan LookWork, tempat di mana karir dimulai dan talenta terbaik ditemukan.
+    </p>
+    <a class="btn btn-lg btn-primary" href="view_post.php">Review LookWork</a>
+  </div>
+  <div class="col-md-5">
+    <img class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" src="pic/pun.png" width="500" height="500" alt="Placeholder Image">  
+  </div>
+</div>
+
 
         <hr class="featurette-divider">
 
         <section id="services" class="services-section">
-            <h2><b>LookWork</b></h2>
+        <div class="d-flex align-items-center justify-content-between">
+    <h2 class="mb-0"><b>LookWork</b></h2> 
+    <?php
+    if (isset($_SESSION['pengguna_id'])) {
+        echo '<button class="btn btn-lg btn-primary" onclick="window.location.href=\'jobseek.php\'">Cari Pekerjaan</button>';
+    } else {
+        echo '<button class="btn btn-lg btn-primary" onclick="window.location.href=\'login.php\'">Login Terlebih Dahulu</button>';
+    }
+    ?>
+</div>
+
             <main class="container mt-5">
-        <div class="grid-container">
+            <div class="grid-container" data-aos="fade-up" data-aos-duration="2000">
         <?php
 include 'koneksi.php';
 
 // Query dengan LIMIT 3 untuk menampilkan maksimal 3 lowongan saja
 $sql = "SELECT jobs.*, companies.company_name FROM jobs 
         LEFT JOIN companies ON jobs.company_id = companies.company_id
-        LIMIT 4";  // Batasi hasil yang diambil hanya 3
+        LIMIT 8";  // Batasi hasil yang diambil hanya 3
 
 $result = $db->query($sql);
 
@@ -247,13 +327,8 @@ if ($result->num_rows > 0) {
         echo "<p><strong>Persyaratan:</strong> " . $persyaratan . "</p>";  // Menampilkan persyaratan pekerjaan
         echo "</div>";
     }
-    echo '<button class="btn btn-lg btn-primary" onclick="window.location.href=\'jobseek.php\'">Cari Pekerjaan</button>';
     // Tombol pencarian kerja
-    if (isset($_SESSION['user_id'])) {
-        echo '<button class="btn btn-lg btn-primary" onclick="window.location.href=\'jobseek.php\'">Cari Pekerjaan</button>';
-    } else {
-        echo '<button class="btn btn-lg btn-primary" onclick="window.location.href=\'login.php\'">Login Terlebih Dahulu</button>';
-    }
+    
 } else {
     echo "<p>No records found</p>";
 }
@@ -266,15 +341,25 @@ $db->close();
         </section>
 
         <hr id="comp"class="featurette-divider">
-    <h2><b>Profile Perusahaan</b></h2>
-    <div class="grid-container">
+        <div class="d-flex align-items-center justify-content-between">
+    <h2 class="mb-0"><b>Profile Perusahaan</b></h2> 
+    <?php
+    if (isset($_SESSION['pengguna_id'])) {
+        echo '<button class="btn btn-lg btn-primary" onclick="window.location.href=\'comp.php\'">Cari Perusahaan</button>';
+    } else {
+        echo '<button class="btn btn-lg btn-primary" onclick="window.location.href=\'login.php\'">Login Terlebih Dahulu</button>';
+    }
+    ?>
+</div>
+    <div class="grid-container" data-aos="fade-up" data-aos-duration="2000">
+
     <?php
 include 'koneksi.php';
 
 // Query dengan JOIN ke tabel perusahaan untuk mengambil nama, deskripsi, dan email perusahaan
 $sql = "SELECT jobs.*, companies.company_name, companies.company_description, companies.contact_email, companies.company_id 
         FROM jobs 
-        LEFT JOIN companies ON jobs.company_id = companies.company_id  LIMIT 4";
+        LEFT JOIN companies ON jobs.company_id = companies.company_id  LIMIT 8";
 
 $result = $db->query($sql);
 
@@ -293,13 +378,7 @@ if ($result->num_rows > 0) {
         echo "<p><strong>Lokasi:</strong> " . $lokasi . "</p>";  // Menampilkan lokasi perusahaan
         echo "</div>";
     }
-    echo "<a href='comp.php' class='btn btn-lg btn-primary'>Profil Perusahaan</a>";
     // Tombol Profil Perusahaan
-    if (isset($_SESSION['user_id'])) {
-        echo "<a href='comp.php' class='btn btn-lg btn-primary'>Profil Perusahaan</a>";
-    } else {
-        echo '<button class="btn btn-lg btn-primary" onclick="window.location.href=\'login.php\'">Login Terlebih Dahulu</button>';
-    }
 } else {
     echo "<p>No records found</p>";
 }
@@ -310,71 +389,43 @@ $db->close();
 
 
     </div>
-    <hr id="kontak"class="featurette-divider">
 
-    <h2><b>Komentar mereka :</b></h2>
-    <div class="grid-container">
+
+    <hr id="kontak"class="featurette-divider">
+    <div class="d-flex flex-column align-items-center">
+    <h2><b>Kontak Kami</b></h2>
+    <div class="grid-container" data-aos="fade-right" data-aos-duration="2000">
+
     <?php
     $no_wa = 6282266479716;
     ?>
 
     <!-- Link WhatsApp dengan gambar ikon -->
-    <a href="https://wa.me/<?php echo $no_wa ?>?text=halo saya ingin bertanya" target="_blank">
-        <img src="pic/wa.png" alt="WhatsApp" style="width: 50px; height: 50px; vertical-align:middle;"> 
+    <div class="sosial-media">
+    <!-- Link WhatsApp -->
+    <a href="https://wa.me/<?php echo $no_wa; ?>?text=Halo%20saya%20ingin%20bertanya" target="_blank" class="sosial-media-link">
+        <img src="pic/wa.png" alt="WhatsApp" style="width: 50px; height: 50px; vertical-align:middle;">
     </a>
     
-    <br>
-    <?php
-    $judul = "Nama Pekerjaan";
-    $lokasi = "Jakarta";
-    $mailto_link = "mailto:" . "lookwork@lkwrk.co" . "?subject=Job%20Application%20for%20" . urlencode($judul) .
-        "&body=Dear%20Employer,%0A%0AI%20am%20interested%20in%20applying%20for%20the%20position%20of%20" .
-        urlencode($judul) . "%20located%20in%20" . urlencode($lokasi) . ".%0A%0AThank%20you.";
-    ?>
+    <!-- Link Email -->
+    <a href="mailto:custsercices@lookwork.com?subject=Subject%20Anda&body=Halo,%20saya%20ingin%20bertanya." target="_blank" class="sosial-media-link">
+    <img src="pic/email.jpg" alt="Gmail" style="width: 50px; height: 50px; vertical-align:middle;">
+</a>
 
-    <!-- Link mailto dengan gambar ikon email -->
-    <a href="<?php echo $mailto_link ?>" class="btn-apply">
-        <img src="pic/email.jpg" alt="Email" style="width: 50px; height: 50px; vertical-align:middle;">
-    </a>
-
-    <br>
-    <!-- Link Instagram dengan gambar ikon Instagram -->
-    <a href="https://www.instagram.com/lookwork__/" target="_blank">
+    
+    <!-- Link Instagram -->
+    <a href="https://www.instagram.com/lookwork__/" target="_blank" class="sosial-media-link">
         <img src="pic/ig.png" alt="Instagram" style="width: 50px; height: 50px; vertical-align:middle;">
     </a>
 </div>
+</div>
 
-    <hr id="kontak"class="featurette-divider">
-    <h2><b>Kontak Kami</b></h2>
-    <div class="grid-container">
-    <?php
-    $no_wa = 6282266479716;
-    ?>
+  
+    </div>
+   
+</div>
 
-    <!-- Link WhatsApp dengan gambar ikon -->
-    <a href="https://wa.me/<?php echo $no_wa ?>?text=halo saya ingin bertanya" target="_blank">
-        <img src="pic/wa.png" alt="WhatsApp" style="width: 50px; height: 50px; vertical-align:middle;"> 
-    </a>
-    
-    <br>
-    <?php
-    $judul = "Nama Pekerjaan";
-    $lokasi = "Jakarta";
-    $mailto_link = "mailto:" . "lookwork@lkwrk.co" . "?subject=Job%20Application%20for%20" . urlencode($judul) .
-        "&body=Dear%20Employer,%0A%0AI%20am%20interested%20in%20applying%20for%20the%20position%20of%20" .
-        urlencode($judul) . "%20located%20in%20" . urlencode($lokasi) . ".%0A%0AThank%20you.";
-    ?>
 
-    <!-- Link mailto dengan gambar ikon email -->
-    <a href="<?php echo $mailto_link ?>" class="btn-apply">
-        <img src="pic/email.jpg" alt="Email" style="width: 50px; height: 50px; vertical-align:middle;">
-    </a>
-
-    <br>
-    <!-- Link Instagram dengan gambar ikon Instagram -->
-    <a href="https://www.instagram.com/lookwork__/" target="_blank">
-        <img src="pic/ig.png" alt="Instagram" style="width: 50px; height: 50px; vertical-align:middle;">
-    </a>
 </div>
   
         </div><!-- /.row -->
@@ -391,9 +442,15 @@ $db->close();
 
       <!-- FOOTER -->
       <footer >
-      <p>&copy; 2024 LookWork. All Rights Reserved.</p>
+        
+        
+      <p>&copy; 2024 LookWork. All Rights Reserved. </p>
       </footer>
     </main>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      AOS.init();
+    </script>
     <script src="../projekweb/assets/dist/js/bootstrap.bundle.min.js"></script>
 
         </body>

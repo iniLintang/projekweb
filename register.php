@@ -1,68 +1,146 @@
-<!doctype html>
-<html lang="en" data-bs-theme="auto">
-  <head>
-    <script src="../projekweb/assets/js/color-modes.js"></script>
+<?php
+session_start(); // Memulai sesi
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.122.0">
-    <title>Register · Bootstrap v5.3</title>
+// Konfigurasi database
+$host = "localhost"; 
+$username_db = "root"; 
+$password_db = ""; 
+$database = "lookwork2";  
 
-    <link href="../projekweb/assets/dist/css/bootstrap.min.css" rel="stylesheet">
+// Membuat koneksi ke database
+$conn = new mysqli($host, $username_db, $password_db, $database);
 
+// Memeriksa koneksi
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
+}
+
+// Menangani proses registrasi saat form disubmit
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $nama = $_POST['full_name']; // Disesuaikan dengan kolom 'nama' di tabel
+    $email = $_POST['email'];
+    $kata_sandi = $_POST['password']; // Disesuaikan dengan kolom 'kata_sandi'
+    $confirm_password = $_POST['confirm_password'];
+
+    // Mencegah SQL Injection
+    $username = mysqli_real_escape_string($conn, $username);
+    $nama = mysqli_real_escape_string($conn, $nama);
+    $email = mysqli_real_escape_string($conn, $email);
+
+    // Memeriksa apakah username atau email sudah ada di database
+    $sql = "SELECT * FROM pengguna WHERE username = ? OR email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $username, $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // Jika ada hasil, artinya username atau email sudah digunakan
+        $error = "Username atau Email sudah terpakai!";
+    } else {
+        // Memeriksa apakah password dan konfirmasi password cocok
+        if ($kata_sandi === $confirm_password) {
+            // Meng-hash password
+            $hashed_password = password_hash($kata_sandi, PASSWORD_DEFAULT);
+
+            // Query untuk menyimpan data pengguna ke database
+            $sql = "INSERT INTO pengguna (username, nama, email, kata_sandi) VALUES (?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssss", $username, $nama, $email, $hashed_password);
+
+            if ($stmt->execute()) {
+                // Ambil id_pengguna yang baru saja diinsert
+                $id_pengguna = $conn->insert_id;
+
+                // Masukkan data ke tabel pencari_kerja
+                $sql_pencari_kerja = "INSERT INTO pencari_kerja (id_pengguna) VALUES (?)";
+                $stmt_pencari_kerja = $conn->prepare($sql_pencari_kerja);
+                $stmt_pencari_kerja->bind_param("i", $id_pengguna);
+
+                if ($stmt_pencari_kerja->execute()) {
+                    // Redirect ke halaman login setelah berhasil registrasi
+                    header("Location: login.php");
+                    exit();
+                } else {
+                    $error = "Terjadi kesalahan pada saat menyimpan data pencari kerja: " . $conn->error;
+                }
+            } else {
+                $error = "Terjadi kesalahan: " . $conn->error;
+            }
+        } else {
+            $error = "Password dan konfirmasi password tidak cocok!";
+        }
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - LookWork</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="sign-in.css">
     <style>
-      body {
-        background: linear-gradient(140deg, #6A9C89, #C4DAD2, #E9EFEC);
-        height: 100vh;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .form-signin {
-        padding: 10px;
-        border-radius: 8px;
-        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-      }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+
+        .login-form {
+            width: 400px;
+            padding: 40px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .error {
+            color: red;
+        }
     </style>
-  </head>
-  
-  <body class="d-flex align-items-center py-4 bg-body-tertiary">
-    <main class="form-signin w-100 m-auto">
-      <form class="text-center">
-        <div class="d-flex justify-content-center">
-          <img class="mb-3" src="pic/lwork.png" alt="Logo" width="250" height="250">
-        </div>
+</head>
+<body>
+    <div class="login-form" style="color : #16423C">
+        <h2><b>Register LookWork</b></h2>
 
+        <?php if (isset($error)): ?>
+            <div class="error"><?= $error; ?></div>
+        <?php endif; ?>
 
-        <div class="form-floating mb-3">
-          <input type="text" class="form-control" id="floatingName" placeholder="Full Name">
-          <label for="floatingName">Full Name</label>
-        </div>
+        <form action="register.php" method="post">
+            <div class="form-group"><br>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" class="form-control" required>
+            </div>
 
-        <div class="form-floating mb-3">
-          <input type="email" class="form-control" id="floatingEmail" placeholder="name@example.com">
-          <label for="floatingEmail">Email address</label>
-        </div>
+            <div class="form-group">
+                <label for="full_name">Full Name:</label>
+                <input type="text" id="full_name" name="full_name" class="form-control" required>
+            </div>
 
-        <div class="form-floating mb-3">
-          <input type="text" class="form-control" id="floatingUsername" placeholder="Username">
-          <label for="floatingUsername">Username</label>
-        </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+            </div>
 
-        <div class="form-floating mb-3">
-          <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-          <label for="floatingPassword">Password</label>
-        </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+            </div>
 
-        <button class="btn btn-primary w-100 py-2" type="submit">Register</button>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password:</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+            </div>
 
-        <a class="mt-3 mb-2 nav-link" href="login.php">Sudah punya akun? Login</a> 
-      </form>
-    </main>
-
-    <script src="../projekweb/assets/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+            <button type="submit" class="btn btn-info">Register</button>
+            <p class="text-center mt-3" >Sudah memiliki Akun? <a href="login.php">Login</a></p>
+        </form>
+    </div>
+</body>
 </html>

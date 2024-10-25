@@ -1,56 +1,43 @@
 <?php
-session_start(); // Memulai sesi
+session_start();
 
-// Konfigurasi database
-$host = "localhost"; 
-$username_db = "root"; 
-$password_db = ""; 
-$database = "lookwork2"; 
+// Sertakan file koneksi database
+include('db.php'); // Pastikan path ke file 'db.php' sudah benar
 
-// Membuat koneksi ke database
-$conn = new mysqli($host, $username_db, $password_db, $database);
-
-// Memeriksa koneksi
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
-}
-
-// Menangani proses login saat form disubmit
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email']; // Menggunakan email karena di tabel 'pengguna' nama kolomnya adalah 'email'
-    $password = $_POST['password']; // Menggunakan 'password' sebagai input
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
     // Mencegah SQL Injection dengan menggunakan prepared statements
-    $stmt = $conn->prepare("SELECT * FROM pengguna WHERE email = ?");
-    $stmt->bind_param("s", $email);
+    $stmt = $conn->prepare("SELECT * FROM admin WHERE username = ?");
+    $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    // Memeriksa apakah email ditemukan
+    // Memeriksa apakah username ditemukan
     if ($result->num_rows == 1) {
         $row = $result->fetch_assoc();
         
         // Memverifikasi password yang di-hash
-        if (password_verify($password, $row['kata_sandi'])) {
+        if (password_verify($password, $row['password'])) {
             // Set session variables
-            $_SESSION['pengguna_id'] = $row['id_pengguna'];
-            $_SESSION['email'] = $row['email'];
-            $_SESSION['username'] = $row['username'];
+            $_SESSION['admin_id'] = $row['admin_id'];  // Menggunakan admin_id dari tabel admin
+            $_SESSION['username'] = $row['username'];  // Menyimpan username admin dalam sesi
             
-            // Redirect ke halaman yang sesuai setelah login
-            header("Location: index.php");
+            header("Location: index.php"); // Redirect ke halaman utama setelah login
             exit();
         } else {
-            $error = "Password salah!";
+            $error = "Username atau Password salah!";
         }
     } else {
-        // Jika email tidak ditemukan, berikan pesan kesalahan
-        $error = "Email tidak ditemukan!";
+        $error = "Username atau Password salah!";
     }
 
     $stmt->close(); // Menutup statement
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html>
@@ -99,18 +86,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php } ?>
         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
             <div class="form-group">
-                <label for="email" style="color : #16423C">Email:</label>
-                <input type="email" class="form-control" id="email" name="email" required>
+                <label for="username" style="color : #16423C">Username:</label>
+                <input type="text" class="form-control" id="username" name="username" required>
             </div>
             <div class="form-group password-wrapper">
                 <label for="password" style="color : #16423C">Password:</label>
                 <input type="password" class="form-control" id="password" name="password" required>
                 <i class="fas fa-eye" id="togglePassword"></i> <!-- Ikon mata untuk toggle -->
             </div>
-            <p class="text-left mt-3"> <a href="forgotpass.php">Lupa password?</a></p>
             <button type="submit" class="btn btn-info btn-block">Login</button>
         </form>
         <p class="text-center mt-3">Belum punya akun? <a href="register.php">Register</a></p>
+        <p class="text-center mt-3"> <a href="pass/forgotpass.php">lupa password?</a></p>
     </div>
 
     <script>

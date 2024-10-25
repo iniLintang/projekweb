@@ -1,6 +1,6 @@
 <?php
 include('db.php');
-
+session_start();
 // Mengambil data berdasarkan ID
 if (isset($_GET['id'])) {
     $job_id = $_GET['id'];
@@ -23,7 +23,7 @@ if (isset($_POST['update'])) {
             WHERE job_id = $job_id";
 
     if ($conn->query($sql) === TRUE) {
-        header("Location: index.php");
+        header("Location: data-pekerjaan.php");
         exit;
     } else {
         echo "Error updating record: " . $conn->error;
