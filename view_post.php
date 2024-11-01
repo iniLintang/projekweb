@@ -71,6 +71,7 @@ $conn->close();
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
 
     <link href="../projekweb/assets/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="aset/reviewlist.css">
 
 
         <style>
@@ -238,27 +239,37 @@ $conn->close();
                     <a class="nav-link" href="index.php#comp">Profile Perusahaan</a>
                   </li>
                   <li class="nav-item">
+                    <a class="nav-link" href="index.php#komentar">Kata Mereka</a>
+                  </li>
+                  <li class="nav-item">
                     <a class="nav-link" href="index.php#kontak">Kontak</a>
                   </li>
+                  <?php
+                  if (isset($_SESSION['username'])) {
+                      echo ' <a class="nav-link" href="user/notif.php">Notifikasi</a>';
+                  } else {
+                      echo '<a class="nav-link" href=""></a>';
+                  } 
+                  ?>
                 </ul>
 
-                <form class="d-flex" role="search">
-                  <?php if (isset($_SESSION['username'])): ?>
-                    <!-- Jika user sudah login, tampilkan dropdown -->
-                    <div class="dropdown">
-                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                        <?php echo $_SESSION['username']; ?> <!-- Menampilkan username -->
-                      </button>
-                      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <form class="d-flex ml-auto" role="search" method="get" action="search.php"> <!-- Specify action and method -->
+            <?php if (isset($_SESSION['username'])): ?>
+                <!-- Jika user sudah login, tampilkan dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <?php echo htmlspecialchars($_SESSION['username']); ?> <!-- Menampilkan username -->
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-                        <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-                      </ul>
-                    </div>
-                  <?php else: ?>
-                    <!-- Jika user belum login, tampilkan link Login -->
-                    <a class="nav-link" href="login.php">Login</a>
-                  <?php endif; ?>
-                </form>
+                        <li><a class="dropdown-item" href="login/logout.php">Logout</a></li>
+                    </ul>
+                </div>
+            <?php else: ?>
+                <!-- Jika user belum login, tampilkan link Login -->
+                <a class="nav-link" href="login/login.php">Login</a>
+            <?php endif; ?>
+        </form>
               </div>
             </div>
           </nav>

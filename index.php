@@ -1,5 +1,55 @@
 <?php
 session_start();
+
+
+// Koneksi ke database
+$host = "localhost";
+$username = "root"; // Sesuaikan dengan konfigurasi database kamu
+$password = "";     // Sesuaikan dengan konfigurasi database kamu
+$database = "lookwork"; // Nama database kamu
+
+$conn = new mysqli($host, $username, $password, $database);
+
+// Cek koneksi
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
+}
+
+$avg_sql = "SELECT AVG(rating) AS avg_rating FROM review";
+$avg_result = $conn->query($avg_sql);
+
+if ($avg_result->num_rows > 0) {
+    $row = $avg_result->fetch_assoc();
+    $avg_rating = round($row['avg_rating'], 1); // Membulatkan hasil ke 1 angka desimal
+} else {
+    $avg_rating = 0; // Jika tidak ada review
+}
+
+// Query untuk mendapatkan data review dari database
+$sql = "SELECT user_id, rating, deskripsi, date FROM review ORDER BY date DESC";
+$result = $conn->query($sql);
+
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Ambil data dari form
+    $user_id = mysqli_real_escape_string($conn, $_POST['userName']);
+    $rating = mysqli_real_escape_string($conn, $_POST['userRating']);
+    $title = "User Review"; // Judul bisa disesuaikan jika perlu
+    $deskripsi = mysqli_real_escape_string($conn, $_POST['userReview']);
+    $date = date('Y-m-d');
+
+    // Query untuk memasukkan data ke dalam tabel 'review'
+    $sql = "INSERT INTO review (user_id, rating, title, deskripsi, date) 
+            VALUES ('$user_id', '$rating', '$title', '$deskripsi', '$date')";
+
+    if ($conn->query($sql) === TRUE) {
+        echo "Review berhasil dikirim!";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+$conn->close();
+
 ?>
     <!doctype html>
     <html lang="en" data-bs-theme="auto">
@@ -136,6 +186,55 @@ session_start();
     .sosial-media-link {
         margin: 10px;
     }
+    /* Kontainer utama untuk grid review */
+    
+      /* Kontainer untuk seluruh komponen */
+      .kata-mereka {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 20px;
+          width: 100%;
+      }
+
+      /* Styling untuk form filter */
+      #filterForm {
+          width: 100%;
+          max-width: 300px; /* Tentukan lebar maksimum agar tetap responsif */
+          margin-bottom: 20px;
+      }
+
+      .form-group {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+      }
+
+      /* Styling untuk kontainer review */
+      #reviewList {
+          display: flex;
+          gap: 20px;
+          overflow-x: auto; /* Membuat scroll horizontal jika konten melebihi lebar layar */
+          padding: 10px 0;
+          scroll-behavior: smooth; /* Smooth scroll untuk navigasi */
+      }
+
+      /* Styling untuk tiap review card */
+      .review-card {
+          background-color: #f8f9fa;
+          border: 1px solid #ddd;
+          border-radius: 10px;
+          padding: 15px;
+          min-width: 250px; /* Menentukan lebar minimum tiap card */
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          transition: transform 0.3s;
+      }
+
+      .review-card:hover {
+          transform: translateY(-5px); /* Efek hover */
+      }
+
+
         
         </style>
 
@@ -168,13 +267,16 @@ session_start();
                     <a class="nav-link" href="index.php#comp">Profile Perusahaan</a>
                   </li>
                   <li class="nav-item">
+                    <a class="nav-link" href="index.php#komentar">Kata Mereka</a>
+                  </li>
+                  <li class="nav-item">
                     <a class="nav-link" href="index.php#kontak">Kontak</a>
                   </li>
                   <?php
                   if (isset($_SESSION['username'])) {
-                      echo ' <a class="nav-link" href="index.php#kontak">Notifikasi</a>';
+                      echo ' <a class="nav-link" href="user/notif.php">Notifikasi</a>';
                   } else {
-                      echo '<a class="nav-link" href="index.php#kontak"></a>';
+                      echo '<a class="nav-link" href=""></a>';
                   } 
                   ?>
                 </ul>
@@ -188,12 +290,12 @@ session_start();
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-                        <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                        <li><a class="dropdown-item" href="login/logout.php">Logout</a></li>
                     </ul>
                 </div>
             <?php else: ?>
                 <!-- Jika user belum login, tampilkan link Login -->
-                <a class="nav-link" href="login.php">Login</a>
+                <a class="nav-link" href="login/login.php">Login</a>
             <?php endif; ?>
         </form>
               </div>
@@ -275,7 +377,7 @@ session_start();
     if (isset($_SESSION['pengguna_id'])) {
         echo '<button class="btn btn-lg btn-primary" onclick="window.location.href=\'jobseek.php\'">Cari Pekerjaan</button>';
     } else {
-        echo '<button class="btn btn-lg btn-primary" onclick="window.location.href=\'login.php\'">Login Terlebih Dahulu</button>';
+        echo '<button class="btn btn-lg btn-primary" onclick="window.location.href=\'login.php\'">Cari Pekerjaan</button>';
     }
     ?>
 </div>
@@ -347,7 +449,7 @@ $db->close();
     if (isset($_SESSION['pengguna_id'])) {
         echo '<button class="btn btn-lg btn-primary" onclick="window.location.href=\'comp.php\'">Cari Perusahaan</button>';
     } else {
-        echo '<button class="btn btn-lg btn-primary" onclick="window.location.href=\'login.php\'">Login Terlebih Dahulu</button>';
+        echo '<button class="btn btn-lg btn-primary" onclick="window.location.href=\'login.php\'">Cari Perusahaan</button>';
     }
     ?>
 </div>
@@ -388,6 +490,29 @@ $db->close();
 
 
 
+    </div>
+
+
+    <hr id="komentar"class="featurette-divider">
+    <div class="d-flex flex-column align-items-left">
+    <h2><b>Kata mereka tentang lookwork</b></h2>
+    <div class="kata-mereka" data-aos="fade-up" data-aos-duration="2000">
+    <form id="filterForm" method="GET" action="">
+            <div class="form-group" >
+                <label for="filterRating">Urutkan Berdasarkan:</label>
+                <select class="form-control" id="filterRating" name="filterRating" onchange="this.form.submit()">
+                    <option value="desc" <?php if(isset($_GET['filterRating']) && $_GET['filterRating'] == 'desc') echo 'selected'; ?>>Rating Tertinggi</option>
+                    <option value="asc" <?php if(isset($_GET['filterRating']) && $_GET['filterRating'] == 'asc') echo 'selected'; ?>>Rating Terendah</option>
+                </select>
+            </div>
+        </form>
+
+            <div id="reviewList" class="mt-3">
+                <?php include 'view/display_reviews.php' ; 
+                
+                ?>
+            </div>
+    </div> 
     </div>
 
 

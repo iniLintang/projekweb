@@ -1,5 +1,5 @@
 <?php
-session_start(); // Memulai sesi
+session_start();
 
 // Konfigurasi database
 $host = "localhost"; 
@@ -17,8 +17,8 @@ if ($conn->connect_error) {
 
 // Menangani proses login saat form disubmit
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email']; // Menggunakan email karena di tabel 'pengguna' nama kolomnya adalah 'email'
-    $password = $_POST['password']; // Menggunakan 'password' sebagai input
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
     // Mencegah SQL Injection dengan menggunakan prepared statements
     $stmt = $conn->prepare("SELECT * FROM pengguna WHERE email = ?");
@@ -29,26 +29,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Memeriksa apakah email ditemukan
     if ($result->num_rows == 1) {
         $row = $result->fetch_assoc();
-        
+
         // Memverifikasi password yang di-hash
         if (password_verify($password, $row['kata_sandi'])) {
             // Set session variables
             $_SESSION['pengguna_id'] = $row['id_pengguna'];
             $_SESSION['email'] = $row['email'];
             $_SESSION['username'] = $row['username'];
-            
-            // Redirect ke halaman yang sesuai setelah login
-            header("Location: index.php");
+            $_SESSION['peran'] = $row['peran'];
+
+            // Redirect sesuai dengan peran
+            if ($row['peran'] == 'pencari_kerja') {
+                header("Location: ../index.php"); 
+            } elseif ($row['peran'] == 'perusahaan') {
+                header("Location: ../comp/index.php");
+            } elseif ($row['peran'] == 'admin') {
+                header("Location: admin/index.php");
+            }
             exit();
         } else {
             $error = "Password salah!";
         }
     } else {
-        // Jika email tidak ditemukan, berikan pesan kesalahan
         $error = "Email tidak ditemukan!";
     }
 
-    $stmt->close(); // Menutup statement
+    $stmt->close();
 }
 ?>
 
@@ -57,37 +63,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <title>Login - LookWork</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Menambahkan font-awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="sign-in.css">
     <style>
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .login-form {
-            width: 400px;
-            padding: 40px;
-            background: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .password-wrapper {
-            position: relative;
-        }
-
-        .password-wrapper i {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #16423C;
-        }
+        body { display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .login-form { width: 400px; padding: 40px; background: #fff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .password-wrapper { position: relative; }
+        .password-wrapper i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #16423C; }
     </style>
 </head>
 <body>
@@ -105,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="form-group password-wrapper">
                 <label for="password" style="color : #16423C">Password:</label>
                 <input type="password" class="form-control" id="password" name="password" required>
-                <i class="fas fa-eye" id="togglePassword"></i> <!-- Ikon mata untuk toggle -->
+                <i class="fas fa-eye" id="togglePassword"></i>
             </div>
             <p class="text-left mt-3"> <a href="forgotpass.php">Lupa password?</a></p>
             <button type="submit" class="btn btn-info btn-block">Login</button>
@@ -118,11 +100,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         const password = document.querySelector("#password");
 
         togglePassword.addEventListener("click", function () {
-            // Toggle tipe input antara password dan text
             const type = password.getAttribute("type") === "password" ? "text" : "password";
             password.setAttribute("type", type);
-            
-            // Ubah ikon mata saat password terlihat atau tersembunyi
             this.classList.toggle("fa-eye-slash");
         });
     </script>

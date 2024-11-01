@@ -141,43 +141,63 @@ $result = $conn->query($sql);
                             <button class="btn btn-outline-secondary" type="submit">Cari</button>
                         </div>
                     </form>
+                    <!-- Tombol Tambah Pekerjaan -->
+<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addJobModal">
+    Tambah Pekerjaan
+</button>
 
-                    <!-- Form Tambah Data Pekerjaan -->
-                    <div id="formTambah" class="card p-4 mb-4" style="display: none;">
-                        <h5 class="card-title">Form Tambah Data Pekerjaan</h5>
-                        <form method="POST" action="">
-                            <div class="form-group">
-                                <label>Company ID</label>
-                                <input type="text" name="company_id" class="form-control" value="<?php echo $companies; ?>" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label>Job Title</label>
-                                <input type="text" name="job_title" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Job Description</label>
-                                <textarea name="job_description" class="form-control" required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Location</label>
-                                <input type="text" name="location" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Salary Range</label>
-                                <input type="text" name="salary_range" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Job Type</label>
-                                <select name="job_type" class="form-control" required>
-                                    <option value="Full-Time">Full-Time</option>
-                                    <option value="Part-Time">Part-Time</option>
-                                    <option value="Contract">Contract</option>
-                                    <option value="Internship">Internship</option>
-                                </select>
-                            </div>
-                            <button type="submit" name="create" class="btn btn-success mt-3">Simpan Pekerjaan</button>
-                        </form>
+<!-- Modal untuk Tambah Pekerjaan -->
+<div class="modal fade" id="addJobModal" tabindex="-1" aria-labelledby="addJobModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addJobModalLabel">Tambah Pekerjaan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="company_id" class="form-label">Perusahaan</label>
+                        <select name="company_id" id="company_id" class="form-select" required>
+                            <option value="">Pilih Perusahaan</option>
+                            <?php
+                            $sql_companies = "SELECT company_id, company_name FROM companies";
+                            $result_companies = $conn->query($sql_companies);
+                            while ($company = $result_companies->fetch_assoc()) {
+                                echo "<option value='" . $company['company_id'] . "'>" . htmlspecialchars($company['company_name']) . "</option>";
+                            }
+                            ?>
+                        </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="job_title" class="form-label">Judul Pekerjaan</label>
+                        <input type="text" class="form-control" id="job_title" name="job_title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="job_description" class="form-label">Deskripsi Pekerjaan</label>
+                        <textarea class="form-control" id="job_description" name="job_description" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Lokasi</label>
+                        <input type="text" class="form-control" id="location" name="location" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="salary_range" class="form-label">Kisaran Gaji</label>
+                        <input type="text" class="form-control" id="salary_range" name="salary_range" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="job_type" class="form-label">Jenis Pekerjaan</label>
+                        <input type="text" class="form-control" id="job_type" name="job_type" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-primary" name="create">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
                     <!-- Tabel Data Pekerjaan -->
                     <div class="table-responsive">

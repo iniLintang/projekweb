@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -50,12 +51,21 @@
                 <input type="text" class="form-control" id="lokasi" name="lokasi" required>
             </div>
             <div class="form-group">
-                <label for="jenis_pekerjaan">Jenis Pekerjaan</label>
-                <input type="text" class="form-control" id="jenis_pekerjaan" name="jenis_pekerjaan" required>
+                <label>Jenis Pekerjaan:</label>
+                <select name="tipe_kerja" class="form-control">
+                    <option value="full_time" <?php if($row['jenis_pekerjaan'] == 'full_time') echo 'selected'; ?>>Full Time</option>
+                    <option value="part_time" <?php if($row['jenis_pekerjaan'] == 'part_time') echo 'selected'; ?>>Part Time</option>
+                    <option value="freelance" <?php if($row['jenis_pekerjaan'] == 'freelance') echo 'selected'; ?>>Freelance</option>
+                    <option value="internship" <?php if($row['jenis_pekerjaan'] == 'internship') echo 'selected'; ?>>Internship</option>
+                </select>
             </div>
             <div class="form-group">
-                <label for="tipe_kerja">Tipe Kerja</label>
-                <input type="text" class="form-control" id="tipe_kerja" name="tipe_kerja" required>
+                <label>Tipe Kerja:</label>
+                <select name="tipe_kerja" class="form-control">
+                    <option value="Remote" <?php if($row['tipe_kerja'] == 'remote') echo 'selected'; ?>>Remote</option>
+                    <option value="Wfo" <?php if($row['tipe_kerja'] == 'Wfo') echo 'selected'; ?>>Wfo</option>
+                    <option value="Hybrid" <?php if($row['tipe_kerja'] == 'Hybrid') echo 'selected'; ?>>Hybrid</option>
+                </select>
             </div>
             <div class="form-group">
                 <label for="gaji">Gaji</label>
