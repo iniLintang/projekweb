@@ -40,9 +40,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Redirect sesuai dengan peran
             if ($row['peran'] == 'pencari_kerja') {
-                header("Location: ../index.php"); 
+                header("Location: ../user/indexx.php"); 
             } elseif ($row['peran'] == 'perusahaan') {
-                header("Location: ../comp/index.php");
+                header("Location: ../perusahaan/index.php");
             } elseif ($row['peran'] == 'admin') {
                 header("Location: admin/index.php");
             }

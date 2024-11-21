@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -54,7 +57,7 @@
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Profil</a>
                         <div class="dropdown-menu rounded-0 m-0">
                             <a href="pengaturan_profil.php" class="dropdown-item">Pengaturan Profil</a>
-                            <a href="keluar.php" class="dropdown-item">Keluar</a>
+                            <a href="../login/logout.php" class="dropdown-item">Keluar</a>
                         </div>
                 </div>
                 <a href="tambah_pekerjaan.php" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block">Tambahkan Loker<i class="fa fa-arrow-right ms-3"></i></a>
