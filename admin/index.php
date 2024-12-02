@@ -1,322 +1,383 @@
 <?php
-session_start(); // Memastikan sesi dimulai
+// Koneksi database
+include('db.php'); // Pastikan file ini benar-benar ada dan terkoneksi dengan database Anda
+session_start();
+// Query 1: Jumlah lowongan aktif
+$sql_jobs = "SELECT COUNT(*) AS jumlah_pekerjaan FROM pekerjaan WHERE tipe_kerja = 'Aktif'";
+$result_jobs = $conn->query($sql_jobs);
 
-// Periksa apakah admin sudah login
-if (isset($_SESSION['admin_id'])) {
-    // Admin sudah login, biarkan akses
+if ($result_jobs) {
+    $row = $result_jobs->fetch_assoc();
+    $jumlah_pekerjaan = $row['jumlah_pekerjaan'] ?? 0; // Default 0 jika hasil NULL
 } else {
-    // Jika bukan admin, hapus sesi dan hentikan akses
-    session_unset(); // Hapus semua variabel sesi
-    session_destroy(); // Menghancurkan sesi untuk keamanan tambahan
-    header("Location: login.php"); // Redirect ke halaman login
-    exit(); // Menghentikan eksekusi kode lebih lanjut
+    $jumlah_pekerjaan = 0; // Default jika query gagal
 }
-// Check if the admin is logged in and if the session has their username
-if (isset($_SESSION['username'])) {
-    $adminName = $_SESSION['username']; // You can use 'admin_username' if you prefer username
-} 
 
-include('db.php');
+// Query 2: Jumlah pengguna berdasarkan peran
+$sql_users = "SELECT peran, COUNT(id_pengguna) AS jumlah_pengguna FROM pengguna GROUP BY peran";
+$result_users = $conn->query($sql_users);
 
-$sql = "SELECT MONTH(created_at) AS month, COUNT(*) AS total_jobs 
-        FROM jobs 
-        GROUP BY MONTH(created_at) 
-        ORDER BY MONTH(created_at)";
-$result = $conn->query($sql);
+$user_roles = [];
+$user_counts = [];
 
-$months = [];
-$total_jobs = [];
-
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $months[] = $row['month'];
-        $total_jobs[] = $row['total_jobs'];
+if ($result_users && $result_users->num_rows > 0) {
+    while ($row = $result_users->fetch_assoc()) {
+        $user_roles[] = $row['peran']; // Ambil data peran
+        $user_counts[] = $row['jumlah_pengguna']; // Ambil data jumlah pengguna
     }
 }
 
-// Prepare data for JavaScript
-$months_json = json_encode($months);
-$total_jobs_json = json_encode($total_jobs);
+// Query 3: Perusahaan paling aktif
+$sql_companies = "SELECT perusahaan.nama_perusahaan, 
+                         COUNT(pekerjaan.id_pekerjaan) AS job_count, 
+                         MAX(pekerjaan.tanggal_posting) AS last_posted
+                  FROM perusahaan
+                  LEFT JOIN pekerjaan ON perusahaan.id_perusahaan = pekerjaan.id_perusahaan
+                  GROUP BY perusahaan.id_perusahaan
+                  ORDER BY job_count DESC
+                  LIMIT 5";
+$result_companies = $conn->query($sql_companies);
+
+
+
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- start: Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-    <!-- start: Icons -->
-    <!-- start: CSS -->
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <!-- end: CSS -->
-    <!-- start charts-->
-    <title>LookWork Dashboard</title>
+    <meta charset="utf-8">
+    <title>Perusahaan_LookWork</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="img/favicon.ico" rel="icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Inter:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="lib/animate/animate.min.css" rel="stylesheet">
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
 </head>
 <style>
-     .namaadm {
-        display: flex;
-        justify-content: flex-end; /* Memastikan teks berada di kanan */
-        align-items: center;
-        margin-right: 20px; /* Memberikan sedikit jarak dari tepi kanan halaman */
+    body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #f4f4f9;
+    }
+    .panel-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        border-radius: 10px; /* Membuat sudut lebih bulat untuk tampilan modern */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Bayangan halus */
     }
 
-    /* Untuk mengatur teks agar tidak meluap keluar halaman */
-    .namaadm div {
-        white-space: nowrap; /* Menghindari teks terpotong atau meluap */
-        overflow: hidden;
-        text-overflow: ellipsis; /* Jika terlalu panjang, tambahkan '...' */
+    .panel-card:hover {
+        transform: translateY(-10px); /* Panel sedikit terangkat ke atas */
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Menambahkan bayangan lebih tebal saat hover */
+        background-color: #f8f9fa; /* Menambahkan perubahan warna latar belakang pada hover */
     }
+    .table-container {
+    max-width: 80%; /* Membatasi lebar tabel */
+    margin: 0 auto; /* Memusatkan tabel di tengah */
+}
+.table {
+    width: 100%; /* Pastikan tabel mengambil lebar maksimal dari container-nya */
+}
 
-    .menu {
-        display: flex;
-        justify-content: center; /* Mengatur elemen untuk berada di tengah secara horizontal */
-        align-items: center; /* Mengatur elemen agar sejajar secara vertikal */
-        margin: 10px; /* Jarak di sekeliling elemen */
-    }
 
-    .menu div {
-            white-space: nowrap; /* Menghindari teks terpotong ke baris baru */
-            margin: 0 15px; /* Menambahkan jarak horizontal antar item (15px) */
-        }
-        
-    .summary-icon {
-        width: 40px; /* Set a specific width */
-        height: 40px; /* Set a specific height */
-        border-radius: 50%; /* Make it circular */
-        display: flex;
-        justify-content: center; /* Center icon horizontally */
-        align-items: center; /* Center icon vertically */
-    }
-
-</style>
-
+            </style>
 <body>
-
-    <!-- start: Sidebar -->
-    <div class="sidebar position-fixed top-0 bottom-0 bg-white border-end">
-        <div class="d-flex align-items-center p-3">
-            <a href="#" class="sidebar-logo fw-bold text-decoration-none text-uppercase fs-4" style="color: #425C5A;">LookWork</a>
-            <i class="sidebar-toggle ri-arrow-left-circle-line ms-auto fs-5 d-none d-md-block"></i>        
+    <div class="container-xxl bg-white p-0">
+        <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
         </div>
-        <ul class="sidebar-menu p-3 m-0 mb-0">
-            <li class="sidebar-menu-item active">
-                <a href="#" style="color: #425C5A; background-color: #ffffff;">
-                    <i class="ri-dashboard-line sidebar-menu-item-icon"></i>
-                    Menu Utama
-                </a>
-            </li>
-            <li class="sidebar-menu-item has-dropdown">
-            <a href="data-pekerjaan.php">
-                    <i class="ri-pages-line sidebar-menu-item-icon"></i>
-                    Data
-                    <i class="ri-arrow-down-s-line sidebar-menu-item-accordion ms-auto"></i>
-                </a>
-                <ul class="sidebar-dropdown-menu">
-                    <li class="sidebar-dropdown-menu-item">
-                    <a href="data-pekerjaan.php">
-                        <i class="ri-briefcase-line"></i>
-                            Pekerjaan
-                        </a>
-                    </li>
-                    <li class="sidebar-dropdown-menu-item">
-                    <a href="data-perusahaan.php">
-                        <i class="ri-building-line"></i>
-                            Perusahaan
-                        </a>
-                    </li>
-                    <li class="sidebar-dropdown-menu-item">
-                        <a href="data-user.php">
-                        <i class="ri-user-3-line"></i>
-                            Pengguna
-                        </a>
-                </ul>
-            </li>
-            <li class="sidebar-menu-item has-dropdown">
-                <a href="#">
-                    <i class="ri-pages-line sidebar-menu-item-icon"></i>
-                    Laporan
-                    <i class="ri-arrow-down-s-line sidebar-menu-item-accordion ms-auto"></i>
-                </a>
-                <ul class="sidebar-dropdown-menu">
-                    <li class="sidebar-dropdown-menu-item">
-                        <a href="report1.php">
-                            <i class="ri-briefcase-line"></i>
-                            Pekerjaan per Perusahaan
-                        </a>
-                    </li>
-                    <li class="sidebar-dropdown-menu-item">
-                        <a href="report2.php">
-                            <i class="ri-building-line"></i>
-                            Pekerjaan Berdasarkan Jenis pekerjaan
-                        </a>
-                    </li>
-                    <li class="sidebar-dropdown-menu-item">
-                        <a href="data-user.php">
-                            <i class="ri-user-3-line"></i>
-                            Pengguna
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="sidebar-menu-item">
-                <a href="logout.php">
-                <i class="ri-logout-box-line sidebar-menu-item-icon"></i>
-                    Logout
-                </a>
         </div>
-    <div class="sidebar-overlay"></div>
-    <!-- end: Sidebar -->
 
-    <!-- start: Main -->
-    <main class="bg-light">
-            <!-- start: Navbar -->
-            <nav class="px-3 py-2 bg-white rounded shadow-sm">
-                <i class="ri-menu-line sidebar-toggle me-3 d-block d-md-none"></i>
-                <h5 class="fw-bold mb-0 me-auto">Menu Utama</h5>
-                <div class="dropdown me-3 d-none d-sm-block">
-                    <div class="cursor-pointer dropdown-toggle navbar-link" data-bs-toggle="dropdown" aria-expanded="false">
+        <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+       <a href="index.php" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
+       <h1 class="m-0" style="color: #16423C;">LookWork</h1>
+       </a>
+            <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">              
+            <div class="navbar-nav ms-auto p-4 p-lg-0">
+                    <a href="index.php" class="nav-item active nav-link ">Beranda</a>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Manajemen Data</a>
+                        <div class="dropdown-menu rounded-0 m-0">
+                            <a href="data-pekerjaan.php" class="dropdown-item">Pekerjaan</a>
+                            <a href="data-perusahaan.php" class="dropdown-item">Perusahaan</a>
+                            <a href="data-user.php" class="dropdown-item">Pengguna</a>
+                            <a href="kategori-pekerjaan.php" class="dropdown-item">Kategori Pekerjaan</a>
+                        </div>
                     </div>
-                    <div class="dropdown">
-                    <div namaadm>
-                    <div>Welcome, <?php echo htmlspecialchars($adminName); ?>!</div>
-                    </div>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Laporan</a>
+                        <div class="dropdown-menu rounded-0 m-0">
+                        <a href="report1.php" class="dropdown-item">Pekerjaan</a>
+                            <a href="report2.php" class="dropdown-item">Perusahaan</a>
+                            <a href="report3.php" class="dropdown-item">Pengguna</a>
+                        </div>
+                        </div>
+
+                <div class="dropdown">
+                    <a href="#" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block dropdown-toggle" style="background-color: #6A9C89; border-color: #6A9C89;" data-bs-toggle="dropdown">
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="logout.php">Keluar</a></li>
+                    </ul>
+                </div>
+        </nav>
+    </div>   
+
+    <div class="container mt-4"> <!-- Menambah margin top untuk memberi jarak antara navbar dan konten -->
+    <div class="row justify-content-center">
+        <!-- Panel 1: Lowongan Aktif -->
+                <?php
+        // Koneksi ke database
+        include('db.php'); // Pastikan file ini berisi koneksi ke database
+
+        // Ambil jumlah lowongan
+        $sql_lowongan = "SELECT COUNT(id_pekerjaan) AS jumlah_lowongan FROM pekerjaan";
+        $result_lowongan = $conn->query($sql_lowongan);
+        $row_lowongan = $result_lowongan->fetch_assoc();
+        $jumlah_lowongan = $row_lowongan['jumlah_lowongan'];
+
+        // Ambil jumlah perusahaan
+        $sql_perusahaan = "SELECT COUNT(id_perusahaan) AS jumlah_perusahaan FROM perusahaan";
+        $result_perusahaan = $conn->query($sql_perusahaan);
+        $row_perusahaan = $result_perusahaan->fetch_assoc();
+        $jumlah_perusahaan = $row_perusahaan['jumlah_perusahaan'];
+
+        // Ambil jumlah pengguna
+        $sql_pengguna = "SELECT COUNT(id_pengguna) AS jumlah_pengguna FROM pengguna";
+        $result_pengguna = $conn->query($sql_pengguna);
+        $row_pengguna = $result_pengguna->fetch_assoc();
+        $jumlah_pengguna = $row_pengguna['jumlah_pengguna'];
+        ?>
+
+        <div class="row justify-content-center">
+            <!-- Panel 1: Lowongan Aktif -->
+            <div class="col-md-3 mb-4"> 
+                <div class="card panel-card" style="background-color: white; color: #6A9C89; border: 2px solid #6A9C89; border-radius: 10px;">
+                    <div class="card-body text-center">
+                        <h5>Jumlah Lowongan Aktif</h5>
+                        <h2><?php echo $jumlah_lowongan; ?></h2>
                     </div>
                 </div>
-            </nav>
-            <!-- end: Navbar -->
+            </div>
 
-            <!-- start: Content -->
-            <div class="py-4">
-            <div class="menu">
-    <div class="col-12 col-sm-6 col-lg-3">
-        <a href="dashboard.php?hal=jobs"
-           class="text-dark text-decoration-none bg-white p-3 rounded shadow-sm d-flex justify-content-between align-items-center summary-primary">
-            <div class="text-end">
-                <?php  
-                // Mengambil total data dari tabel jobs
-                $jobs_query = mysqli_query($conn, "SELECT COUNT(*) as total_jobs FROM jobs");
-                if ($jobs_query) {
-                    $jobs_data = mysqli_fetch_assoc($jobs_query);
-                    $total_jobs = $jobs_data['total_jobs'];
-                } else {
-                    $total_jobs = 0; // Default to 0 if query fails
-                }
-                ?>
-                <div>Total Loker</div>
-                <h4 class="number-display"><?php echo htmlspecialchars($total_jobs); ?></h4>
+            <!-- Panel 2: Jumlah Perusahaan -->
+            <div class="col-md-3 mb-4">
+                <div class="card panel-card" style="background-color: white; color: #f0ad4e; border: 2px solid #f0ad4e; border-radius: 10px;">
+                    <div class="card-body text-center">
+                        <h5>Jumlah Perusahaan</h5>
+                        <h2><?php echo $jumlah_perusahaan; ?></h2>
+                    </div>
+                </div>
             </div>
-            <i class="ri-briefcase-line summary-icon bg-primary mb-2"></i>
-        </a>
-    </div>
-    
-    <div class="col-12 col-sm-6 col-lg-3">
-        <a href="dashboard.php?hal=companies"
-           class="text-dark text-decoration-none bg-white p-3 rounded shadow-sm d-flex justify-content-between align-items-center summary-indigo">
-            <div class="text-end">
-                <?php  
-                // Mengambil total data dari tabel companies
-                $companies_query = mysqli_query($conn, "SELECT COUNT(*) as total_companies FROM companies");
-                if ($companies_query) {
-                    $companies_data = mysqli_fetch_assoc($companies_query);
-                    $total_companies = $companies_data['total_companies'];
-                } else {
-                    $total_companies = 0; // Default to 0 if query fails
-                }
-                ?>
-                <div>Total Perusahaan</div>
-                <h4 class="number-display"><?php echo htmlspecialchars($total_companies); ?></h4>
-            </div>
-            <i class="ri-building-line summary-icon bg-success mb-2"></i>
-        </a>
-    </div>
-    
-    <div class="col-12 col-sm-6 col-lg-3">
-        <a href="dashboard.php?hal=users"
-           class="text-dark text-decoration-none bg-white p-3 rounded shadow-sm d-flex justify-content-between align-items-center summary-success">
-            <div class="text-end">
-                <?php  
-                // Mengambil total data dari tabel users
-                $users_query = mysqli_query($conn, "SELECT COUNT(*) as total_users FROM users");
-                if ($users_query) {
-                    $users_data = mysqli_fetch_assoc($users_query);
-                    $total_users = $users_data['total_users'];
-                } else {
-                    $total_users = 0; // Default to 0 if query fails
-                }
-                ?>
-                <div>Total Pengguna</div>
-                <h4 class="number-display"><?php echo htmlspecialchars($total_users); ?></h4>
-            </div>
-            <i class="ri-user-add-line summary-icon bg-danger mb-2"></i>
-        </a>
-    </div>
-</div>
 
-</div>
-
-                <!-- end: Summary -->
-                <!-- start: Graph -->
-                <div class="row g-3 mt-2 justify-content-center">
-    <div class="col-12 col-md-8"> <!-- Kolom yang lebih sempit agar lebih mudah di tengah -->
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white">
-                Tingkat Aktivitas pada LookWork
-            </div>
-            <div class="card-body">
-                <canvas id="sales-chart"></canvas>
+            <!-- Panel 3: Jumlah Pengguna -->
+            <div class="col-md-3 mb-4">
+                <div class="card panel-card" style="background-color: white; color: #d9534f; border: 2px solid #d9534f; border-radius: 10px;">
+                    <div class="card-body text-center">
+                        <h5>Jumlah Pengguna</h5>
+                        <h2><?php echo $jumlah_pengguna; ?></h2>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // Prepare data from PHP
-    const months = <?php echo $months_json; ?>;
-    const totalJobs = <?php echo $total_jobs_json; ?>;
 
-    // Create chart
-    const ctx = document.getElementById('sales-chart').getContext('2d');
-    const salesChart = new Chart(ctx, {
-        type: 'bar', // You can change this to 'line', 'pie', etc.
+
+ <!-- Grafik Jumlah Lowongan Aktif per Bulan -->
+ <?php
+// Koneksi ke database
+include('db.php'); // Pastikan file ini berisi koneksi ke database
+
+// Ambil jumlah lowongan
+$sql_lowongan = "SELECT COUNT(id_pekerjaan) AS jumlah_lowongan FROM pekerjaan";
+$result_lowongan = $conn->query($sql_lowongan);
+$row_lowongan = $result_lowongan->fetch_assoc();
+$jumlah_lowongan = $row_lowongan['jumlah_lowongan'];
+
+// Ambil jumlah perusahaan
+$sql_perusahaan = "SELECT COUNT(id_perusahaan) AS jumlah_perusahaan FROM perusahaan";
+$result_perusahaan = $conn->query($sql_perusahaan);
+$row_perusahaan = $result_perusahaan->fetch_assoc();
+$jumlah_perusahaan = $row_perusahaan['jumlah_perusahaan'];
+
+// Ambil jumlah pengguna
+$sql_pengguna = "SELECT COUNT(id_pengguna) AS jumlah_pengguna FROM pengguna";
+$result_pengguna = $conn->query($sql_pengguna);
+$row_pengguna = $result_pengguna->fetch_assoc();
+$jumlah_pengguna = $row_pengguna['jumlah_pengguna'];
+?>
+
+<div class="col-md-12">
+    <h3 class="text-center">Distribusi Jumlah Lowongan, Pengguna, dan Perusahaan</h3>
+    <div class="row">
+        <!-- Diagram Lingkaran Lowongan -->
+        <div class="col-md-4">
+            <canvas id="lowonganPieChart" width="400" height="400"></canvas>
+        </div>
+
+        <!-- Diagram Lingkaran Pengguna -->
+        <div class="col-md-4">
+            <canvas id="penggunaPieChart" width="400" height="400"></canvas>
+        </div>
+
+        <!-- Diagram Lingkaran Perusahaan -->
+        <div class="col-md-4">
+            <canvas id="perusahaanPieChart" width="400" height="400"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Menambahkan Chart.js -->
+
+<script>
+    // Diagram Lingkaran Lowongan
+    var ctx1 = document.getElementById('lowonganPieChart').getContext('2d');
+    var lowonganPieChart = new Chart(ctx1, {
+        type: 'pie',
         data: {
-            labels: months.map(month => month.toString()), // Convert month numbers to strings if needed
+            labels: ['Lowongan Aktif'],
             datasets: [{
-                label: 'Total Pekerjaan',
-                data: totalJobs,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
+                data: [<?php echo $jumlah_lowongan; ?>],
+                backgroundColor: ['rgba(70, 130, 70, 0.6)'], // Warna hijau
+                borderColor: ['rgba(70, 130, 70, 1)'],
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.raw + ' Lowongan';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Diagram Lingkaran Pengguna
+    var ctx2 = document.getElementById('penggunaPieChart').getContext('2d');
+    var penggunaPieChart = new Chart(ctx2, {
+        type: 'pie',
+        data: {
+            labels: ['Pengguna Aktif'],
+            datasets: [{
+                data: [<?php echo $jumlah_pengguna; ?>],
+                backgroundColor: ['rgba(255, 165, 0, 0.6)'], // Warna oranye
+                borderColor: ['rgba(255, 165, 0, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.raw + ' Pengguna';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Diagram Lingkaran Perusahaan
+    var ctx3 = document.getElementById('perusahaanPieChart').getContext('2d');
+    var perusahaanPieChart = new Chart(ctx3, {
+        type: 'pie',
+        data: {
+            labels: ['Perusahaan Aktif'],
+            datasets: [{
+                data: [<?php echo $jumlah_perusahaan; ?>],
+                backgroundColor: ['rgba(220, 53, 69, 0.6)'], // Warna merah
+                borderColor: ['rgba(220, 53, 69, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.raw + ' Perusahaan';
+                        }
+                    }
                 }
             }
         }
     });
 </script>
 
-<!-- end: Graph -->
+<!-- Company Report Table -->
+<div class="table-container mt-4">
+    <h4 class="mt-4">Perusahaan Paling Aktif</h4>
+    <table class="table table-bordered mt-2">
+        <thead>
+            <tr>
+                <th>Nama Perusahaan</th>
+                <th>Jumlah Lowongan</th>
+                <th>Lowongan Terakhir</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if ($result_companies && $result_companies->num_rows > 0): ?>
+                <?php while ($row = $result_companies->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['nama_perusahaan']); ?></td>
+                        <td><?= htmlspecialchars($row['job_count']); ?></td>
+                        <td><?= htmlspecialchars($row['last_posted']); ?></td>
+                    </tr>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="3">Tidak ada data</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
 
 
-    </main>
-    <!-- end: Main -->
+</script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/wow/wow.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
 
-    <!-- start: JS -->
-    <script src="../assets/js/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js" integrity="sha512-sW/w8s4RWTdFFSduOTGtk4isV1+190E/GghVffMA9XczdJ2MDzSzLEubKAs5h0wzgSJOQTRYyaz73L3d6RtJSg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="../assets/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/script.js"></script>
-    <!-- end: JS -->
+    <script src="js/main.js"></script>
+    
+    <script src="js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

@@ -48,9 +48,6 @@ $stmt->bind_param("i", $id_pencari_kerja);
 $stmt->execute();
 $result = $stmt->get_result();
 ?>
-<!DOCTYPE html>
-<html lang="en">
-
 <head>
     <meta charset="utf-8">
     <title>PencariKerja_LookWork</title>
@@ -59,6 +56,7 @@ $result = $stmt->get_result();
     <meta content="" name="description">
 
     <link href="img/favicon.ico" rel="icon">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Inter:wght@700;800&display=swap" rel="stylesheet">
@@ -68,65 +66,85 @@ $result = $stmt->get_result();
 
     <link href="lib/animate/animate.min.css" rel="stylesheet">
     <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
     <link href="css/bootstrap.min.css" rel="stylesheet">
+
     <link href="css/style.css" rel="stylesheet">
 </head>
+<style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #f4f4f9;
+        }
+        .btn-primary {
+    background-color: #6A9C89;
+    border-color: #6A9C89;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #5b876f;
+    border-color: #5b876f;
+}
+        </style>
 
 <body>
     <div class="container-xxl bg-white p-0">
-        <!-- Spinner -->
         <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                 <span class="sr-only">Loading...</span>
             </div>
         </div>
-        <!-- Spinner End -->
+        </div>
 
-        <!-- Navbar -->
+
         <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-            <a href="index_2.html" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
-                <h1 class="m-0" style="color: #16423C;">LookWork</h1>
-            </a>
+       <a href="indexx.php" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
+       <h1 class="m-0" style="color: #16423C;">LookWork</h1>
+       </a>
             <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
-                <!-- Navigasi di kiri -->
-                <div class="navbar-nav me-auto p-4 p-lg-0">
-                    <a href="index_2.html" class="nav-item nav-link active">Beranda</a>
-                    <a href="index_2.html#tentang" class="nav-item nav-link">Tentang</a>
-                    <a href="index_2.html#testi" class="nav-item nav-link">Testi</a>
-                    <a href="index_2.html#kontak" class="nav-item nav-link">Kontak</a>
-                    <a href="daftar_pekerjaan.html" class="nav-item nav-link">Pekerjaan</a>
-                    <a href="daftar_perusahaan.html" class="nav-item nav-link">Perusahaan</a>
-                    <a href="notifikasi.html" class="nav-item nav-link">Notifikasi</a>
-                </div>
-                
-                <!-- Tombol di kanan -->
-                <?php if(isset($_SESSION['username'])): ?>
-                    <div class="dropdown">
-                        <a href="#" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block dropdown-toggle" style="background-color: #6A9C89; border-color: #6A9C89;" data-bs-toggle="dropdown">
-                            <?php echo htmlspecialchars($_SESSION['username']); ?>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="profil.html">Profil</a></li>
-                            <li><a class="dropdown-item" href="logout.php">Keluar</a></li>
-                        </ul>
+                    <!-- Navigasi di kiri -->
+                    <div class="navbar-nav me-auto p-4 p-lg-0">
+                        <a href="indexx.php#beranda" class="nav-item nav-link ">Beranda</a>
+                        <a href="indexx.php#tentang" class="nav-item nav-link">Tentang</a>
+        
+                        <?php if(isset($_SESSION['username']) && $_SESSION['peran'] === 'pencari_kerja'): ?>
+                        <a href="daftar_pekerjaan.php" class="nav-item nav-link ">Pekerjaan</a>
+                        <a href="daftar_perusahaan.php" class="nav-item nav-link">Perusahaan</a>
+                        <a href="notifikasi.php" class="nav-item nav-link">Notifikasi</a>
+                        <?php endif; ?>
+
                     </div>
-                <?php endif; ?>
-            </div>
+                    
+                    <!-- Tombol di kanan -->
+                    <?php if (isset($_SESSION['username'])): ?>
+                <div class="dropdown">
+                    <a href="#" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block dropdown-toggle" style="background-color: #6A9C89; border-color: #6A9C89;" data-bs-toggle="dropdown">
+                        <?= $_SESSION['username']; ?>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="profil.php">Profil</a></li>
+                        <li><a class="dropdown-item" href="logout.php">Keluar</a></li>
+                    </ul>
+                </div>
+            <?php endif; ?>
+
         </nav>
         <!-- Navbar End -->
 
-        <!-- Notifikasi Lamaran -->
-        <div class="container my-4">
-    <h2>Notifikasi Lamaran Anda</h2>
+<!-- Notifikasi Lamaran -->
+<div class="container my-4">
+    <h2 class="mb-4">Notifikasi Lamaran Anda</h2>
+
+    <!-- Filter Section -->
     <form method="GET" action="" class="mb-3">
         <div class="row">
             <div class="col-md-4">
                 <select name="status" class="form-select">
                     <option value="">Semua Status</option>
-                    <option value="dikirim" <?= (isset($_GET['status']) && $_GET['status'] == 'dikirim') ? 'selected' : ''; ?>>Dikirim</option>
                     <option value="diproses" <?= (isset($_GET['status']) && $_GET['status'] == 'diproses') ? 'selected' : ''; ?>>Diproses</option>
                     <option value="diterima" <?= (isset($_GET['status']) && $_GET['status'] == 'diterima') ? 'selected' : ''; ?>>Diterima</option>
                     <option value="ditolak" <?= (isset($_GET['status']) && $_GET['status'] == 'ditolak') ? 'selected' : ''; ?>>Ditolak</option>
@@ -137,14 +155,16 @@ $result = $stmt->get_result();
             </div>
         </div>
     </form>
+
+    <!-- Lamaran Table -->
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>#</th>
                 <th>Pekerjaan</th>
                 <th>Status</th>
-                <th>Tanggal Lamaran</th>
                 <th>Deskripsi</th>
+                <th>Tanggal Lamaran</th>
             </tr>
         </thead>
         <tbody>
@@ -165,8 +185,8 @@ $result = $stmt->get_result();
                                 <span class="badge bg-danger text-white">Ditolak</span>
                             <?php endif; ?>
                         </td>
-                        <td><?= date('d M, Y', strtotime($row['tanggal_lamaran'])); ?></td>
                         <td><?= htmlspecialchars($row['deskripsi']); ?></td>
+                        <td><?= date('d M, Y', strtotime($row['tanggal_lamaran'])); ?></td>
                     </tr>
                 <?php endwhile; ?>
             <?php else: ?>
@@ -177,26 +197,11 @@ $result = $stmt->get_result();
         </tbody>
     </table>
 </div>
-        <!-- Footer -->
-        <div id="kontak" class="container-fluid bg-dark text-white-50 footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">
-            <div class="container py-5">
-                <div class="row justify-content-center">
-                    <div class="col-lg-3 col-md-6 text-center">
-                        <h5 class="text-white mb-4">Kontak</h5>
-                        <p class="mb-2">
-                            <a href="https://www.instagram.com/lookwork__/" target="_blank" class="text-white-50">
-                                <i class="fab fa-instagram me-3"></i>Instagram : @lookwork__
-                            </a>
-                        </p>
-                        <p class="mb-2">
-                            <a href="https://wa.me/<?php echo $no_wa; ?>?text=Halo%20saya%20ingin%20bertanya" target="_blank" class="text-white-50">
-                                <i class="fa fa-envelope me-3"></i>Whatsapp : +<?php echo $no_wa; ?>
-                            </a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+<!-- Optional Wrapper for Other Content -->
+<div class="wrapper"></div>
+
+    
 
                         
             <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>

@@ -6,7 +6,7 @@ session_start();
 $id_pengguna = $_SESSION['pengguna_id'] ?? null;
 
 if (!$id_pengguna) {
-    header("Location: login.php");
+    header("Location: ../login/login.php");
     exit();
 }
 

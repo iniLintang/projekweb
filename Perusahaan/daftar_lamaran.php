@@ -2,21 +2,19 @@
 session_start();
 include 'db_connect.php';
 
-
-// Pastikan pengguna sudah login sebelum mengakses halaman ini
+// Pastikan pengguna sudah login
 if (!isset($_SESSION['pengguna_id'])) {
     header("Location: ../login/login.php");
     exit;
 }
 
-// Mendapatkan ID pengguna dari sesi
 $id_pengguna = intval($_SESSION['pengguna_id']);
 if (!$id_pengguna) {
     echo "ID pengguna tidak valid.";
     exit;
 }
 
-// Mendapatkan ID perusahaan berdasarkan ID pengguna (gunakan prepared statement)
+// Mendapatkan ID perusahaan
 $perusahaanQuery = $conn->prepare("SELECT id_perusahaan FROM perusahaan WHERE id_pengguna = ?");
 $perusahaanQuery->bind_param("i", $id_pengguna);
 $perusahaanQuery->execute();
@@ -30,71 +28,97 @@ if (!$perusahaanRow) {
 
 $id_perusahaan = $perusahaanRow['id_perusahaan'];
 
-// Query untuk mendapatkan daftar pekerjaan yang diposting oleh perusahaan ini
+// Mendapatkan daftar pekerjaan
 $pekerjaanQuery = $conn->prepare("SELECT id_pekerjaan, judul_pekerjaan FROM pekerjaan WHERE id_perusahaan = ?");
 $pekerjaanQuery->bind_param("i", $id_perusahaan);
 $pekerjaanQuery->execute();
 $pekerjaanResult = $pekerjaanQuery->get_result();
 $pekerjaanList = $pekerjaanResult->fetch_all(MYSQLI_ASSOC);
 
-// Memeriksa apakah pekerjaan dipilih
 $id_pekerjaan = isset($_GET['id_pekerjaan']) ? intval($_GET['id_pekerjaan']) : null;
 
-// Query untuk mendapatkan daftar lamaran jika pekerjaan dipilih
+// Mendapatkan daftar lamaran untuk pekerjaan yang dipilih
 $lamaranList = [];
 if ($id_pekerjaan) {
-    $query = $conn->prepare(
-        "SELECT l.id_lamaran, l.status, l.deskripsi, p.judul_pekerjaan, u.nama AS nama_pencari 
-         FROM lamaran l 
-         JOIN pekerjaan p ON l.id_pekerjaan = p.id_pekerjaan 
-         JOIN pengguna u ON l.id_pencari_kerja = u.id_pengguna 
-         WHERE p.id_perusahaan = ? AND l.id_pekerjaan = ?"
-    );
+    $query = $conn->prepare("
+        SELECT 
+            l.id_lamaran, 
+            l.status, 
+            l.surat_lamaran, 
+            l.cv, 
+            l.deskripsi, 
+            p.judul_pekerjaan, 
+            u.nama AS nama_pencari, 
+            u.id_pengguna AS id_pencari_kerja
+        FROM lamaran l
+        JOIN pekerjaan p ON l.id_pekerjaan = p.id_pekerjaan
+        JOIN pengguna u ON l.id_pencari_kerja = u.id_pengguna
+        WHERE p.id_perusahaan = ? AND l.id_pekerjaan = ?
+    ");
     $query->bind_param("ii", $id_perusahaan, $id_pekerjaan);
     $query->execute();
     $result = $query->get_result();
     $lamaranList = $result->fetch_all(MYSQLI_ASSOC);
 }
 
-
-// Update status lamaran dan kirim email
+// Update status lamaran
 if (isset($_POST['update_status'])) {
     $id_lamaran = intval($_POST['id_lamaran']);
     $status_baru = mysqli_real_escape_string($conn, $_POST['status_lamaran']);
 
-    // Gunakan prepared statement untuk update
     $update_query = $conn->prepare("UPDATE lamaran SET status = ? WHERE id_lamaran = ?");
     $update_query->bind_param("si", $status_baru, $id_lamaran);
+
     if ($update_query->execute()) {
-        // Mengambil email pengguna
-        $email_query = $conn->prepare(
-            "SELECT u.email 
-             FROM lamaran l 
-             JOIN pengguna u ON l.id_pencari_kerja = u.id_pengguna 
-             WHERE l.id_lamaran = ?"
-        );
-        $email_query->bind_param("i", $id_lamaran);
-        $email_query->execute();
-        $email_result = $email_query->get_result();
-        $email_row = $email_result->fetch_assoc();
-
-        if ($email_row && !empty($email_row['email'])) {
-            $email_pencari_kerja = $email_row['email'];
-            // Kirim email pemberitahuan status lamaran
-            $subject = "Update Status Lamaran";
-            $message = "Status lamaran Anda telah diperbarui menjadi: $status_baru.";
-            $headers = "From: info@lookwork.com";
-
-            if (mail($email_pencari_kerja, $subject, $message, $headers)) {
-                echo "Email berhasil dikirim.";
-            } else {
-                echo "Gagal mengirim email.";
-            }
-        }
+        echo "<script>alert('Status lamaran berhasil diperbarui.');</script>";
     } else {
-        echo "Gagal memperbarui status lamaran.";
+        echo "<script>alert('Gagal memperbarui status lamaran.');</script>";
     }
 }
+
+$nama_pencari = isset($_GET['nama_pencari']) ? "%" . $_GET['nama_pencari'] . "%" : "%";
+
+$query = $conn->prepare("
+    SELECT 
+        l.id_lamaran, 
+        l.status, 
+        l.surat_lamaran, 
+        l.cv, 
+        l.deskripsi, 
+        p.judul_pekerjaan, 
+        u.nama AS nama_pencari, 
+        u.id_pengguna AS id_pencari_kerja
+    FROM lamaran l
+    JOIN pekerjaan p ON l.id_pekerjaan = p.id_pekerjaan
+    JOIN pengguna u ON l.id_pencari_kerja = u.id_pengguna
+    WHERE p.id_perusahaan = ? 
+        AND l.id_pekerjaan = ?
+        AND u.nama LIKE ?
+");
+$query->bind_param("iis", $id_perusahaan, $id_pekerjaan, $nama_pencari);
+$query->execute();
+$result = $query->get_result();
+$lamaranList = $result->fetch_all(MYSQLI_ASSOC);
+
+
+if (isset($_POST['update_deskripsi'])) {
+    $id_lamaran = intval($_POST['id_lamaran']);
+    $deskripsi_baru = trim($_POST['deskripsi']);
+
+    if (empty($deskripsi_baru)) {
+        echo "<script>alert('Deskripsi tidak boleh kosong.');</script>";
+    } else {
+        $update_query = $conn->prepare("UPDATE lamaran SET deskripsi = ? WHERE id_lamaran = ?");
+        $update_query->bind_param("si", $deskripsi_baru, $id_lamaran);
+
+        if ($update_query->execute()) {
+            echo "<script>alert('Deskripsi lamaran berhasil diperbarui.');</script>";
+        } else {
+            echo "Error: " . $update_query->error; // Debugging
+        }
+    }
+}
+
 ?>
 
 
@@ -120,26 +144,49 @@ if (isset($_POST['update_status'])) {
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
 </head>
-
+<style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #f4f4f9;
+    }
+            h1 {
+                text-align: center;
+                margin-bottom: 30px
+            }
+            .btn {
+            background-color: #6A9C89;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
 </head>
-<body data-bs-spy="scroll" data-bs-target=".navbar" data-bs-offset="70">
+<body>
     <div class="container-xxl bg-white p-0">
+        <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        </div>
 
-
-    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+        <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
        <a href="index.php" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
-    <h1 class="m-0" style="color: #16423C;">LookWork</h1>
-</a>
+       <h1 class="m-0" style="color: #16423C;">LookWork</h1>
+       </a>
 
-            </a>
             <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
-                <div class="navbar-nav ms-auto p-4 p-lg-0">
-                    <a href="index.php" class="nav-item nav-link active">Beranda</a>
+               
+            <div class="navbar-nav ms-auto p-4 p-lg-0">
+                    <a href="index.php" class="nav-item nav-link ">Beranda</a>
                     <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pekerjaan</a>
+                        <a href="#" class="nav-link active dropdown-toggle" data-bs-toggle="dropdown">Pekerjaan</a>
                         <div class="dropdown-menu rounded-0 m-0">
                             <a href="daftar_loker.php" class="dropdown-item">Daftar Lowongan Pekerjaan</a>
                             <a href="daftar_lamaran.php" class="dropdown-item">Daftar Lamaran Pekerjaan</a>
@@ -159,10 +206,13 @@ if (isset($_POST['update_status'])) {
 
     <body>
     <div class="container mt-5">
-        <h2>Daftar Lamaran Pekerjaan</h2>
+    <h1>Daftar Lamaran Pekerjaan</h1>
 
-        <!-- Filter Pekerjaan -->
-        <form method="GET" action="daftar_lamaran.php" class="mb-3">
+    <!-- Filter Pekerjaan -->
+   <!-- Filter Pekerjaan dan Pencarian -->
+<form method="GET" action="daftar_lamaran.php" class="mb-3">
+    <div class="row mb-2">
+        <div class="col-md-6">
             <label for="pekerjaan">Pilih Pekerjaan:</label>
             <select name="id_pekerjaan" id="pekerjaan" class="form-select">
                 <option value="">-- Pilih Pekerjaan --</option>
@@ -172,81 +222,78 @@ if (isset($_POST['update_status'])) {
                     </option>
                 <?php endforeach; ?>
             </select>
-            <button type="submit" class="btn btn-primary">Tampilkan Lamaran</button>
-        </form>
+        </div>
+        <div class="col-md-6">
+            <label for="nama_pencari">Cari Nama Pelamar:</label>
+            <input type="text" name="nama_pencari" id="nama_pencari" class="form-control" value="<?= htmlspecialchars($_GET['nama_pencari'] ?? ''); ?>" placeholder="Masukkan nama pelamar">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Tampilkan Lamaran</button>
+</form>
 
-        <!-- Menampilkan Daftar Lamaran -->
+
+    <!-- Daftar Lamaran -->
         <?php if ($id_pekerjaan): ?>
             <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Nama Pencari Kerja</th>
-                        <th>Status</th>
-                        <th>Surat Lamaran</th>
-                        <th>Opsi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($lamaranList as $data): ?>
-                        <tr>
-                        <td>
-                            <a href="profile_pencari_kerja.php?id_pengguna=<?= urlencode($data['id_pencari_kerja']); ?>" 
-                            class="btn btn-primary">
+            <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nama Pencari Kerja</th>
+                <th>Status</th>
+                <th>Surat Lamaran</th>
+                <th>CV</th>
+                <th>Deskripsi</th>
+                <th>Opsi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($lamaranList as $data): ?>
+                <tr>
+                    <td>
+                        <a href="profil_pencari_kerja.php?id_pengguna=<?= urlencode($data['id_pencari_kerja']); ?>" class="btn btn-primary">
                             <?= htmlspecialchars($data['nama_pencari']); ?>
-                            </a>
-                        </td>
-                            <td><?= htmlspecialchars($data['status']); ?></td>
-                            <td><a href="surat_lamaran.php?id=<?= urlencode($data['id_lamaran']); ?>">Lihat Surat Lamaran</a></td>
-                            <td>
-                                <form method="POST">
-                                    <input type="hidden" name="id_lamaran" value="<?= $data['id_lamaran']; ?>">
-                                    <select name="status_lamaran" class="form-select">
-                                        <option value="Dikirim" <?= $data['status'] === 'Dikirim' ? 'selected' : ''; ?>>Dikirim</option>
-                                        <option value="Diproses" <?= $data['status'] === 'Diproses' ? 'selected' : ''; ?>>Diproses</option>
-                                        <option value="Diterima" <?= $data['status'] === 'Diterima' ? 'selected' : ''; ?>>Diterima</option>
-                                        <option value="Ditolak" <?= $data['status'] === 'Ditolak' ? 'selected' : ''; ?>>Ditolak</option>
-                                    </select>
-                                    <button type="submit" name="update_status">Ubah Status</button>
-                                </form>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php endif; ?>
-    </div>
+                        </a>
+                    </td>
+                    <td><?= htmlspecialchars($data['status']); ?></td>
+                    <td>
+                        <?php if (!empty($data['surat_lamaran'])): ?>
+                            <a href="<?= '../uploads/' . htmlspecialchars($data['surat_lamaran']); ?>" target="_blank">Lihat Surat Lamaran</a>
+                        <?php else: ?>
+                            <span>Belum diunggah</span>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <?php if (!empty($data['cv'])): ?>
+                            <a href="<?= '../uploads/' . htmlspecialchars($data['cv']); ?>" target="_blank">Lihat CV</a>
+                        <?php else: ?>
+                            <span>Belum diunggah</span>
+                        <?php endif; ?>
+                    </td>
+                    <td><?= nl2br(htmlspecialchars($data['deskripsi'])); ?></td>
+                    <td>
+                        <form method="POST">
+                            <input type="hidden" name="id_lamaran" value="<?= htmlspecialchars($data['id_lamaran']); ?>">
+                            <select name="status_lamaran" class="form-select">
+                                <option value="diproses" <?= $data['status'] === 'diproses' ? 'selected' : ''; ?>>Diproses</option>
+                                <option value="diterima" <?= $data['status'] === 'diterima' ? 'selected' : ''; ?>>Diterima</option>
+                                <option value="ditolak" <?= $data['status'] === 'ditolak' ? 'selected' : ''; ?>>Ditolak</option>
+                            </select>
+                            <input type="hidden" name="id_lamaran" value="<?= htmlspecialchars($data['id_lamaran']); ?>">
+                            <textarea name="deskripsi" class="form-control" placeholder="Masukkan deskripsi"><?= htmlspecialchars($data['deskripsi']); ?></textarea>
+                            <button type="submit" name="update_status" class="btn btn-primary mt-2">Ubah Status</button>
+                            <button type="submit" name="update_deskripsi" class="btn btn-success mt-2">Simpan Deskripsi</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
 
+    <?php else: ?>
+        <p>Silakan pilih pekerjaan untuk melihat lamaran.</p>
+    <?php endif; ?>
+</div>
 
-        <!-- Footer  -->
-        <?php
-        $no_wa = 6282266479716;
-        ?>
-        <div id="kontak" class="container-fluid bg-dark text-white-50 footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">
-            <div class="container py-5">
-                <div class="row justify-content-center">
-                    <div class="col-lg-3 col-md-6 text-center">
-                        <h5 class="text-white mb-4">Kontak</h5>
-                        <p class="mb-2">
-                            <a href="https://www.instagram.com/lookwork__/" target="_blank" class="text-white-50">
-                                <i class="fab fa-instagram me-3"></i>Instagram : @lookwork__
-                            </a>
-                        </p>
-                        <p class="mb-2">
-                            <a href="https://wa.me/<?php echo $no_wa; ?>?text=Halo%20saya%20ingin%20bertanya" target="_blank" class="text-white-50">
-                                <i class="fa fa-phone-alt me-3"></i>WhatsApp: +6282266479716
-                            </a>
-                        </p>
-                        <p class="mb-2">
-                            <a href="mailto:custsercices@lookwork.com?subject=Subject%20Anda&body=Halo,%20saya%20ingin%20bertanya." target="_blank" class="text-white-50">
-                                <i class="fa fa-envelope me-3"></i>Email: info@lookwork.com
-                            </a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer End -->
 
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>

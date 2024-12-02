@@ -49,25 +49,64 @@ try {
 
     <link href="css/style.css" rel="stylesheet">
 </head>
+<style>
+body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #f4f4f9;
+            /* Styling untuk Daftar Perusahaan */
+}
+.company-item {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease;
+}
 
+.company-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+}
+
+/* Penyesuaian gambar logo perusahaan */
+.company-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+}
+
+/* Button Lihat Profil */
+.btn-primary {
+    background-color: #6A9C89;
+    border-color: #6A9C89;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #5b876f;
+    border-color: #5b876f;
+}
+
+        </style>
 <body>
     <div class="container-xxl bg-white p-0">
-        <!-- <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                 <span class="sr-only">Loading...</span>
-            </div> -->
+            </div> 
+        </div>
         </div>
 
+
         <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-                <a href="index_2.html" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
-                    <h1 class="m-0" style="color: #16423C;">LookWork</h1>
-                </a>
-        
-                <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                
-                <div class="collapse navbar-collapse" id="navbarCollapse">
+       <a href="indexx.php" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
+       <h1 class="m-0" style="color: #16423C;">LookWork</h1>
+       </a>
+            <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
                     <!-- Navigasi di kiri -->
                     <div class="navbar-nav me-auto p-4 p-lg-0">
                         <a href="indexx.php#beranda" class="nav-item nav-link ">Beranda</a>
@@ -79,7 +118,6 @@ try {
                         <a href="notifikasi.php" class="nav-item nav-link">Notifikasi</a>
                         <?php endif; ?>
 
-                        <a href="indexx.php#kontak" class="nav-item nav-link">Kontak</a>
                     </div>
                     
                     <!-- Tombol di kanan -->
@@ -89,13 +127,16 @@ try {
                         <?= $_SESSION['username']; ?>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="profil.html">Profil</a></li>
+                        <li><a class="dropdown-item" href="profil.php">Profil</a></li>
                         <li><a class="dropdown-item" href="logout.php">Keluar</a></li>
                     </ul>
                 </div>
             <?php endif; ?>
-            </div>
+
         </nav>
+        <!-- Navbar End -->
+        </div>
+        </div>
 
             <!-- Pencarian -->
             <?php
@@ -142,7 +183,7 @@ try {
 
                     <!-- Lokasi -->
                     <div class="col-md-3">
-                        <input type="text" name="lokasi_perusahaan" class="form-control" placeholder="Lokasi Perusahaan" value="<?= htmlspecialchars($lokasi_perusahaan); ?>">
+                        <input type="text" name="lokasi_perusahaan" class="form-control" placeholder="Lokasi Perusahaan (Juanda, Jawa Timur)" value="<?= htmlspecialchars($lokasi_perusahaan); ?>">
                     </div>
 
                     <!-- Industri -->
@@ -166,45 +207,47 @@ try {
                 </form>
             </div>
 
-            <!-- Daftar Perusahaan -->
-            <div class="container my-4">    
-                            <div class="d-flex">
-                    <?php if ($result && $result->num_rows > 0): ?>
-                        <?php while ($company = $result->fetch_assoc()): ?>
-                            <div class="col-md-6 mb-4">
-                                <div class="company-item p-4 border rounded">
-                                    <div class="d-flex">
-                                        <!-- Menampilkan logo perusahaan jika ada -->
-                                        <?php if (!empty($company['logo'])): ?>
-                                            <img class="img-fluid rounded" src="img/<?= $company['logo']; ?>" alt="<?= $company['nama_perusahaan']; ?>" style="width: 100px; height: 100px;">
-                                        <?php else: ?>
-                                            <img class="img-fluid rounded" src="img/default-logo.png" alt="Default Logo" style="width: 100px; height: 100px;">
-                                        <?php endif; ?>
+<!-- Daftar Perusahaan -->
+<div class="container my-4">
+    <div class="row">
+        <?php if ($result && $result->num_rows > 0): ?>
+            <?php while ($company = $result->fetch_assoc()): ?>
+                <div class="col-md-4 mb-4"> <!-- Ubah ukuran kolom menjadi lebih kecil agar lebih rapat -->
+                    <div class="company-item p-4 border rounded shadow-sm transition-all" style="min-height: 250px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div class="d-flex align-items-center">
+                           <img src="../foto/<?= !empty($company['foto_profil']) ? htmlspecialchars($company['foto_profil']) : '../imgbk/default.png'; ?>" 
+                                        class="img-fluid rounded-circle" 
+                                        style="width: 100px; height: 100px; object-fit: cover;">
 
-                                        <div class="ms-3">
-                                            <h5><?= $company['nama_perusahaan']; ?></h5>
-                                            <p class="mb-1"><i class="fa fa-map-marker-alt text-primary"></i> <?= $company['lokasi_perusahaan']; ?></p>
-                                            <p class="mb-1"><i class="fa fa-building text-primary"></i> <?= $company['industri']; ?></p>
-                                            <p class="mb-1"><i class="fa fa-users text-primary"></i> <?= $company['jumlah_karyawan'] ?? 'N/A'; ?> Karyawan</p>
-                                            <a href="profil_perusahaan.php?id_perusahaan=<?= $company['id_perusahaan']; ?>" class="btn btn-primary mt-2">Lihat Profil Perusahaan</a>
-                                        </div>
-                                    </div>
-                                    <small class="text-muted">Bergabung sejak <?= date('d M, Y', strtotime($company['tanggal_dibuat'])); ?></small>
-                                </div>
+                            <div class="ms-3">
+                                <h5 class="fw-bold"><?= $company['nama_perusahaan']; ?></h5>
+                                <p class="mb-1 text-muted"><i class="fa fa-map-marker-alt text-primary"></i> <?= $company['lokasi_perusahaan']; ?></p>
+                                <p class="mb-1 text-muted"><i class="fa fa-building text-primary"></i> <?= $company['industri']; ?></p>
                             </div>
-                        <?php endwhile; ?>
-                    <?php else: ?>
-                        <p class="text-center">Belum ada perusahaan yang ditemukan.</p>
-                    <?php endif; ?>
+                        </div>
+
+                        <!-- Tombol dan Tanggal Bergabung di bagian bawah -->
+                        <div class="d-flex flex-column align-items-end">
+                            <a href="profil_perusahaan.php?id_perusahaan=<?= $company['id_perusahaan']; ?>" class="btn btn-primary">Lihat Profil</a>
+                            <small class="text-truncate mt-2"><i class="fa fa-calendar-alt text-primary"></i> Bergabung sejak: <?= date('d M, Y', strtotime($company['tanggal_dibuat'])); ?></small>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <?php
-            // Tutup koneksi database
-            $conn->close();
-            ?>
-
+            <?php endwhile; ?>
+        <?php else: ?>
+            <p class="text-center">Belum ada perusahaan yang ditemukan.</p>
+        <?php endif; ?>
+    </div>
 </div>
+
+
+
+
+<?php
+// Tutup koneksi database
+$conn->close();
+?>
+
         
         <!-- Footer  -->
         <?php

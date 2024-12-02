@@ -9,6 +9,6 @@ session_unset();
 session_destroy();
 
 // Arahkan ke halaman login setelah logout
-header("Location: login_admin.php");
+header("Location: ../login/login.php");
 exit();
 ?>

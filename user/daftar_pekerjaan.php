@@ -43,25 +43,89 @@ if (!$result) {
 
     <link href="css/style.css" rel="stylesheet">
 </head>
+<style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #f4f4f9;
+        }
+/* Warna Tab */
+.nav-pills .nav-item .nav-link.active {
+    background-color: #6A9C89; /* Sesuaikan warna seperti yang diinginkan */
+    color: white;
+    border-bottom: 3px solid #4A745F; /* Menambahkan efek border bawah */
+}
+
+.nav-pills .nav-item .nav-link {
+    color: #6A9C89; /* Warna tab non-active */
+    border-bottom: 3px solid transparent;
+}
+
+.nav-pills .nav-item .nav-link:hover {
+    color: #4A745F; /* Warna saat hover pada tab */
+}
+
+/* Smooth Border Radius dan Efek Hover pada job-item */
+.job-item {
+    background-color: #ffffff; /* Warna background putih */
+    border-radius: 10px; /* Membuat sudut sedikit membulat */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Menambahkan bayangan untuk efek kedalaman */
+    padding: 20px; /* Menambahkan jarak di dalam box */
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease; /* Animasi saat hover */
+}
+
+.job-item:hover {
+    transform: translateY(-5px); /* Efek naik sedikit saat dihover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Memperkuat bayangan saat hover */
+    border-radius: 12px; /* Menambahkan efek pembulatan lebih besar saat hover */
+}
+
+/* Tombol Pekerjaan Sesuai dengan Tema */
+.btn-primary {
+    background-color: #6A9C89; /* Warna tombol sesuai tema */
+    border-color: #6A9C89; /* Warna border tombol */
+}
+
+.btn-primary:hover {
+    background-color: #5b876f; /* Warna tombol saat hover */
+    border-color: #5b876f; /* Warna border saat hover */
+}
+
+.btn-primary:focus, .btn-primary:active {
+    background-color: #4f725d; /* Warna tombol saat fokus atau aktif */
+    border-color: #4f725d;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Memperkuat bayangan saat hover */
+}
+    
+    .tab-class {
+        border-radius: 10px;
+        padding: 20px; /* Jarak di dalam container utama */
+    }
+
+    .tab-content {
+        margin-top: 30px;
+    }
+
+
+</style>
+
 
 <body>
-    <div class="container-xxl bg-white p-0">
+<div class="container-xxl bg-white p-0">
         <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                 <span class="sr-only">Loading...</span>
             </div>
         </div>
+        </div>
 
         <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-                <a href="index_2.html" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
-                    <h1 class="m-0" style="color: #16423C;">LookWork</h1>
-                </a>
-        
-                <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                
-                <div class="collapse navbar-collapse" id="navbarCollapse">
+       <a href="indexx.php" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
+       <h1 class="m-0" style="color: #16423C;">LookWork</h1>
+       </a>
+            <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
                     <!-- Navigasi di kiri -->
                     <div class="navbar-nav me-auto p-4 p-lg-0">
                         <a href="indexx.php#beranda" class="nav-item nav-link ">Beranda</a>
@@ -73,23 +137,25 @@ if (!$result) {
                         <a href="notifikasi.php" class="nav-item nav-link">Notifikasi</a>
                         <?php endif; ?>
 
-                        <a href="#kontak" class="nav-item nav-link">Kontak</a>
                     </div>
                     
                     <!-- Tombol di kanan -->
-                                <?php if (isset($_SESSION['username'])): ?>
+                    <?php if (isset($_SESSION['username'])): ?>
                 <div class="dropdown">
                     <a href="#" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block dropdown-toggle" style="background-color: #6A9C89; border-color: #6A9C89;" data-bs-toggle="dropdown">
                         <?= $_SESSION['username']; ?>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="profil.html">Profil</a></li>
+                        <li><a class="dropdown-item" href="profil.php">Profil</a></li>
                         <li><a class="dropdown-item" href="logout.php">Keluar</a></li>
                     </ul>
                 </div>
             <?php endif; ?>
 
         </nav>
+        <!-- Navbar End -->
+        </div>
+        </div>
 
 <!-- Pencarian -->
 <?php
@@ -117,9 +183,10 @@ $tipeKerjaQuery = "SELECT DISTINCT tipe_kerja FROM pekerjaan WHERE tipe_kerja IS
 $tipeKerjaResult = $conn->query($tipeKerjaQuery);
 
 // Query untuk mencari pekerjaan berdasarkan filter
-$query = "SELECT p.*, k.nama_kategori 
+$query = "SELECT p.*, k.nama_kategori, u.foto_profil AS company_logo
           FROM pekerjaan p
           LEFT JOIN kategori_pekerjaan k ON p.id_kategori = k.id_kategori
+          LEFT JOIN pengguna u ON p.id_perusahaan = u.id_pengguna
           WHERE 1";
 
 // Menambahkan filter berdasarkan input dari form
@@ -151,10 +218,10 @@ $result = $conn->query($query);
 
 <!-- Form Pencarian -->
 <div class="container my-4">
-    <form method="GET" action="" class="row g-3 align-items-center">
+    <form method="GET" action="" class="row g-3 align-items-center justify-content-center">
 
-        <!-- Kategori Pekerjaan -->
-        <div class="col-md-3">
+        <!-- Kategori Pekerjaan (Background Terpisah di Sisi Kiri) -->
+        <div class="col-md-3" style="background-color: #A6BCBC; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); margin-right: 20px;">
             <label><strong>Kategori Pekerjaan:</strong></label><br>
             <?php if ($kategoriResult && $kategoriResult->num_rows > 0): ?>
                 <?php while ($row = $kategoriResult->fetch_assoc()): ?>
@@ -165,70 +232,124 @@ $result = $conn->query($query);
             <?php endif; ?>
         </div>
 
-        <!-- Judul Pekerjaan -->
-        <div class="col-md-3">
-            <input type="text" name="judul" class="form-control" placeholder="Judul Pekerjaan" value="<?= htmlspecialchars($judul); ?>">
+        <!-- Elemen Pencarian Pekerjaan lainnya (Sisi Kanan) -->
+        <div class="col-md-8" style="background-color: #CAD7D7; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+            <div class="row g-3">
+
+                <!-- Judul Pekerjaan -->
+                <div class="col-md-3">
+                    <input type="text" name="judul" class="form-control" placeholder="Judul Pekerjaan" value="<?= htmlspecialchars($judul); ?>">
+                </div>
+
+                <!-- Jenis Pekerjaan -->
+                <div class="col-md-3">
+                    <select name="jenis_pekerjaan" class="form-select">
+                        <option value="">Pilih Jenis Pekerjaan</option>
+                        <?php if ($jenisPekerjaanResult && $jenisPekerjaanResult->num_rows > 0): ?>
+                            <?php while ($row = $jenisPekerjaanResult->fetch_assoc()): ?>
+                                <option value="<?= $row['jenis_pekerjaan']; ?>" <?= $jenis_pekerjaan == $row['jenis_pekerjaan'] ? 'selected' : ''; ?>>
+                                    <?= ucfirst($row['jenis_pekerjaan']); ?>
+                                </option>
+                            <?php endwhile; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+
+                <!-- Tipe Kerja -->
+                <div class="col-md-3">
+                    <select name="tipe_kerja" class="form-select">
+                        <option value="">Pilih Tipe Kerja</option>
+                        <?php if ($tipeKerjaResult && $tipeKerjaResult->num_rows > 0): ?>
+                            <?php while ($row = $tipeKerjaResult->fetch_assoc()): ?>
+                                <option value="<?= $row['tipe_kerja']; ?>" <?= $tipe_kerja == $row['tipe_kerja'] ? 'selected' : ''; ?>>
+                                    <?= ucfirst($row['tipe_kerja']); ?>
+                                </option>
+                            <?php endwhile; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+
+                <!-- Lokasi -->
+                <div class="col-md-3">
+                    <input type="text" name="lokasi" class="form-control" placeholder="Lokasi" value="<?= htmlspecialchars($lokasi); ?>">
+                </div>
+
+                <!-- Rentang Gaji -->
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-6">
+                            <input type="number" name="gaji_dari" class="form-control" placeholder="Gaji Dari" value="<?= $gaji_dari; ?>">
+                        </div>
+                        <div class="col-6">
+                            <input type="number" name="gaji_hingga" class="form-control" placeholder="Gaji Hingga" value="<?= $gaji_hingga; ?>">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tombol Cari -->
+                <div class="col-md-3 text-end">
+                    <button type="submit" class="btn btn-primary btn-lg" style="padding: 5px 10px;">Cari Pekerjaan</button>
+                </div>
+
+            </div>
         </div>
 
-        <!-- Jenis Pekerjaan -->
-        <div class="col-md-2">
-            <select name="jenis_pekerjaan" class="form-select">
-                <option value="">Pilih Jenis Pekerjaan</option>
-                <?php if ($jenisPekerjaanResult && $jenisPekerjaanResult->num_rows > 0): ?>
-                    <?php while ($row = $jenisPekerjaanResult->fetch_assoc()): ?>
-                        <option value="<?= $row['jenis_pekerjaan']; ?>" <?= $jenis_pekerjaan == $row['jenis_pekerjaan'] ? 'selected' : ''; ?>>
-                            <?= ucfirst($row['jenis_pekerjaan']); ?>
-                        </option>
-                    <?php endwhile; ?>
-                <?php endif; ?>
-            </select>
-        </div>
-
-        <!-- Tipe Kerja -->
-        <div class="col-md-2">
-            <select name="tipe_kerja" class="form-select">
-                <option value="">Pilih Tipe Kerja</option>
-                <?php if ($tipeKerjaResult && $tipeKerjaResult->num_rows > 0): ?>
-                    <?php while ($row = $tipeKerjaResult->fetch_assoc()): ?>
-                        <option value="<?= $row['tipe_kerja']; ?>" <?= $tipe_kerja == $row['tipe_kerja'] ? 'selected' : ''; ?>>
-                            <?= ucfirst($row['tipe_kerja']); ?>
-                        </option>
-                    <?php endwhile; ?>
-                <?php endif; ?>
-            </select>
-        </div>
-
-        <!-- Lokasi -->
-        <div class="col-md-2">
-            <input type="text" name="lokasi" class="form-control" placeholder="Lokasi" value="<?= htmlspecialchars($lokasi); ?>">
-        </div>
-
-        <!-- Rentang Gaji -->
-        <div class="col-md-2">
-            <input type="number" name="gaji_dari" class="form-control" placeholder="Gaji Dari" value="<?= $gaji_dari; ?>">
-        </div>
-        <div class="col-md-2">
-            <input type="number" name="gaji_hingga" class="form-control" placeholder="Gaji Hingga" value="<?= $gaji_hingga; ?>">
-        </div>
-
-        <!-- Tombol Cari -->
-        <div class="col-md-2 text-end">
-            <button type="submit" class="btn btn-primary">Cari Pekerjaan</button>
-        </div>
     </form>
 </div>
-
 <!-- Job List -->
 <div class="container my-4">
     <div class="row">
         <?php if ($result && $result->num_rows > 0): ?>
             <?php while ($job = $result->fetch_assoc()): ?>
                 <div class="col-md-6 mb-4">
-                    <div class="job-item p-4 border rounded">
-                        <h5><?= $job['judul_pekerjaan']; ?></h5>
-                        <p><i class="fa fa-map-marker-alt"></i> <?= $job['lokasi']; ?></p>
-                        <p><i class="fa fa-money-bill-alt"></i> Rp <?= number_format($job['gaji_dari'], 0, ',', '.'); ?> - Rp <?= number_format($job['gaji_hingga'], 0, ',', '.'); ?></p>
-                        <a href="detail_pekerjaan.php?id=<?= $job['id_pekerjaan']; ?>" class="btn btn-primary btn-sm">Lihat Detail</a>
+                <div class="job-item p-4 border rounded shadow-sm d-flex flex-column justify-content-between" style="height: 250px;">
+                        
+                        <!-- Company Logo -->
+                        <div class="me-3">
+                        <?php if (!empty($pengguna['foto_profil'])): ?>
+                            <img src="../foto/<?= htmlspecialchars($pengguna['foto_profil']); ?>" 
+                                class="img-fluid rounded-circle" 
+                                style="width: 50px; height: 50px; object-fit: cover;" 
+                                alt="Foto Profil Pengguna">
+                        <?php else: ?>
+                            <img src="../imgbk/default.png" 
+                                class="img-fluid rounded-circle" 
+                                style="width: 50px; height: 50px; object-fit: cover;" 
+                                alt="Default Logo">
+                        <?php endif; ?>
+                    </div>
+
+
+                        <!-- Job Description -->
+                        <div>
+                            <h5><?= htmlspecialchars($job['judul_pekerjaan']); ?></h5>
+                            
+                            <!-- Lokasi dan Jenis Pekerjaan -->
+                            <div class="row">
+                                <div class="col-6">
+                                    <p class="text-truncate mb-1"><i class="fa fa-map-marker-alt text-primary"></i> <?= htmlspecialchars($job['lokasi']); ?></p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="text-truncate mb-1"><i class="fa fa-briefcase text-primary"></i> <?= htmlspecialchars($job['jenis_pekerjaan']); ?></p>
+                                </div>
+                            </div>
+
+                            <!-- Gaji -->
+                            <div class="row mb-2">
+                                <div class="col-6">
+                                    <p class="text-truncate mb-1"><i class="fa fa-money-bill-alt text-primary"></i> Rp <?= number_format($job['gaji_dari'], 0, ',', '.'); ?></p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="text-truncate mb-1"><i class="fa fa-money-bill-alt text-primary"></i> Rp <?= number_format($job['gaji_hingga'], 0, ',', '.'); ?></p>
+                                </div>
+                            </div>
+                            
+                            <!-- Tombol Lihat Detail Pekerjaan -->
+                            <div class="d-flex flex-column align-items-end">
+                            <a href="detail_pekerjaan.php?id_pekerjaan=<?= $job['id_pekerjaan']; ?>" class="btn btn-primary mb-2">Lihat Detail Pekerjaan</a>
+                                <small class="text-truncate"><i class="fa fa-calendar-alt text-primary"></i> Tanggal Posting: <?= date('d M, Y', strtotime($job['tanggal_posting'])); ?></small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             <?php endwhile; ?>
@@ -239,6 +360,11 @@ $result = $conn->query($query);
         <?php endif; ?>
     </div>
 </div>
+
+    </div>
+</div>
+
+
 
 <script>
 // Update salary range display value

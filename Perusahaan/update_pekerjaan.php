@@ -1,56 +1,71 @@
 <?php
-include 'db_connect.php'; 
+// Sertakan file koneksi database
+include 'db_connect.php';
 session_start();
 
-// Ensure the logged-in company ID is retrieved from the session
-$id_perusahaan = $_SESSION['id_perusahaan']; // Example session value for the logged-in company
+// Cek apakah ada ID pekerjaan yang diteruskan ke URL
+if (isset($_GET['id_pekerjaan'])) {
+    $id_pekerjaan = $_GET['id_pekerjaan'];
 
+    // Ambil data pekerjaan berdasarkan ID
+    $query = "SELECT * FROM pekerjaan WHERE id_pekerjaan = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $id_pekerjaan);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $pekerjaan = $result->fetch_assoc();
+
+    // Jika pekerjaan tidak ditemukan
+    if (!$pekerjaan) {
+        echo "Pekerjaan tidak ditemukan.";
+        exit;
+    }
+} else {
+    echo "ID pekerjaan tidak diterima.";
+    exit;
+}
+
+// Ambil data kategori pekerjaan dari tabel 'kategori_pekerjaan'
+$query_kategori = "SELECT * FROM kategori_pekerjaan";
+$result_kategori = $conn->query($query_kategori);
+$kategori_pekerjaan = $result_kategori->fetch_all(MYSQLI_ASSOC);
+
+// Proses jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Get the posted values
-    $id_pekerjaan = $_POST['id_pekerjaan'];
+    // Ambil data dari form
+    $id_perusahaan = $_POST['id_perusahaan'];
+    $id_kategori = implode(',', $_POST['kategori']); // Menggabungkan kategori yang dipilih
     $judul_pekerjaan = $_POST['judul_pekerjaan'];
     $deskripsi = $_POST['deskripsi'];
     $lokasi = $_POST['lokasi'];
     $jenis_pekerjaan = $_POST['jenis_pekerjaan'];
-    $tipe_kerja = $_POST['tipe_kerja'];
     $gaji_dari = $_POST['gaji_dari'];
     $gaji_hingga = $_POST['gaji_hingga'];
-    $id_kategori = $_POST['id_kategori'];
 
-    // Create a connection using MySQLi
-    $conn = new mysqli('localhost', 'root', '', 'lookwork2');
+    // Proses update data pekerjaan
+    $update_query = "UPDATE pekerjaan SET 
+                     id_perusahaan = ?, 
+                     id_kategori = ?, 
+                     judul_pekerjaan = ?, 
+                     deskripsi = ?, 
+                     lokasi = ?, 
+                     jenis_pekerjaan = ?, 
+                     gaji_dari = ?, 
+                     gaji_hingga = ? 
+                     WHERE id_pekerjaan = ?";
+    $stmt = $conn->prepare($update_query);
+    $stmt->bind_param("iissssdii", $id_perusahaan, $id_kategori, $judul_pekerjaan, $deskripsi, $lokasi, $jenis_pekerjaan, $gaji_dari, $gaji_hingga, $id_pekerjaan);
+    $stmt->execute();
 
-    // Check the connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    // Prepare the SQL update statement
-    $query = "UPDATE pekerjaan 
-              SET judul_pekerjaan = ?, deskripsi = ?, lokasi = ?, jenis_pekerjaan = ?, tipe_kerja = ?, gaji_dari = ?, gaji_hingga = ?, id_kategori = ? 
-              WHERE id_pekerjaan = ? AND id_perusahaan = ?";
-
-    // Prepare the statement
-    if ($stmt = $conn->prepare($query)) {
-        // Bind parameters: adjust types for each column based on your table definition
-        $stmt->bind_param("sssssdiis", $judul_pekerjaan, $deskripsi, $lokasi, $jenis_pekerjaan, $tipe_kerja, $gaji_dari, $gaji_hingga, $id_kategori, $id_pekerjaan, $id_perusahaan);
-
-        // Execute the query
-        if ($stmt->execute()) {
-            // Redirect if successful
-            header('Location: daftar_loker.php');
-            exit;
-        } else {
-            echo "Error executing query: " . $stmt->error;
-        }
-
-        // Close the statement
-        $stmt->close();
+    // Cek apakah query berhasil
+    if ($stmt->affected_rows > 0) {
+        echo "Data berhasil diperbarui.";
     } else {
-        echo "Error preparing statement: " . $conn->error;
+        echo "Terjadi kesalahan atau data tidak berubah.";
     }
 
-    // Close the connection
-    $conn->close();
+    // Redirect setelah update
+    header("Location: daftar_loker.php");
+    exit;
 }
 ?>

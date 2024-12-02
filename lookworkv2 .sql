@@ -93,7 +93,7 @@ CREATE TABLE `lamaran` (
   `id_pekerjaan` int(11) NOT NULL,
   `id_pencari_kerja` int(11) NOT NULL,
   `surat_lamaran` varchar(225) NOT NULL,
-  `cv_url` varchar(225) NOT NULL,
+  `cv` varchar(225) NOT NULL,
   `status` enum('dikirim','diproses','diterima','ditolak') DEFAULT NULL,
   `deskripsi` text NOT NULL,
   `tanggal_lamaran` timestamp NOT NULL DEFAULT current_timestamp()

@@ -83,17 +83,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - LookWork</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-    <style>
-        body { display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f8f9fa; }
-        .login-form { width: 400px; padding: 40px; background: #fff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-        .error { color: red; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="login-form">
-        <h2 style="color: #16423C"><b>Register LookWork</b></h2>
+    <div class="register-form">
+        <h2><b>LookWork</b></h2>
 
         <?php if (isset($error)): ?>
             <div class="error"><?= $error; ?></div>
@@ -106,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div class="form-group">
-                <label for="full_name">Full Name:</label>
+                <label for="full_name">Nama Lengkap:</label>
                 <input type="text" id="full_name" name="full_name" class="form-control" required>
             </div>
 
@@ -116,12 +115,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div class="form-group">
-                <label for="password">Password:</label>
+                <label for="password">Kata Sandi:</label>
                 <input type="password" id="password" name="password" class="form-control" required>
             </div>
 
             <div class="form-group">
-                <label for="confirm_password">Confirm Password:</label>
+                <label for="confirm_password">konfirmasi Kata Sandi:</label>
                 <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
             </div>
 

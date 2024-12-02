@@ -307,6 +307,13 @@
 }
 
 
+.footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Menyusun elemen secara horisontal ke tengah */
+    justify-content: space-between; /* Menyusun elemen secara vertikal */
+}
+
 .footer .btn.btn-social {
     margin-right: 5px;
     width: 35px;
@@ -375,41 +382,22 @@
     border-right: none;
 }
 
-    .table th {
-        background-color: #ffffff; 
-        color: #393e44; 
-    }
+.table th {
+    background-color: #6A9C89;  /* Ganti dengan warna yang lebih lembut */
+    color: white;  /* Warna teks yang kontras agar mudah dibaca */
+}
 
-    .table tr:nth-child(even) {
-        background-color: #393e44;
-        color: white; 
-    }
+.table tr:nth-child(even) {
+    background-color: #f4f4f4;  /* Warna latar belakang lebih cerah */
+}
 
-    .table tr:nth-child(odd) {
-        background-color: #f8f9fa; 
-    }
+.table tr:nth-child(odd) {
+    background-color: #ffffff;  /* Warna latar belakang putih */
+}
 
-    .table tr:nth-child(even) td {
-        color: white; 
-    }
-
-    .table th {
-        background-color: #ffffff; 
-        color: #393e44; 
-    }
-
-    .table tr:nth-child(even) {
-        background-color: #393e44; 
-        color: white; 
-    }
-
-    .table tr:nth-child(odd) {
-        background-color: #f8f9fa; 
-    }
-
-    .table tr:nth-child(even) td {
-        color: white; 
-    }
+.table td {
+    color: #393e44;  /* Warna teks gelap untuk kontras yang baik */
+}
 
 
 

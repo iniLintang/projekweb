@@ -8,24 +8,27 @@ include 'db_connect.php';
 if (isset($_GET['id_pekerjaan']) && intval($_GET['id_pekerjaan'])) {
     $id_pekerjaan = intval($_GET['id_pekerjaan']);
 
-    // Query untuk mendapatkan detail pekerjaan berdasarkan id_pekerjaan
+    // Query untuk mendapatkan detail pekerjaan dan foto profil perusahaan
     $query = "SELECT 
-                p.id_pekerjaan, 
-                p.judul_pekerjaan, 
-                p.deskripsi, 
-                p.lokasi, 
-                p.jenis_pekerjaan, 
-                p.tipe_kerja, 
-                p.gaji_dari, 
-                p.gaji_hingga, 
-                p.tanggal_posting, 
-                c.id_perusahaan, 
-                c.nama_perusahaan, 
-                c.lokasi_perusahaan, 
-                c.deskripsi_perusahaan 
-              FROM pekerjaan p
-              JOIN perusahaan c ON p.id_perusahaan = c.id_perusahaan
-              WHERE p.id_pekerjaan = ?";
+    p.id_pekerjaan, 
+    p.judul_pekerjaan, 
+    p.deskripsi, 
+    p.lokasi, 
+    p.jenis_pekerjaan, 
+    p.tipe_kerja, 
+    p.gaji_dari, 
+    p.gaji_hingga, 
+    p.tanggal_posting, 
+    c.id_perusahaan, 
+    c.nama_perusahaan, 
+    c.lokasi_perusahaan, 
+    c.deskripsi_perusahaan,
+    u.foto_profil  -- Ambil foto profil dari tabel pengguna
+  FROM pekerjaan p
+  JOIN perusahaan c ON p.id_perusahaan = c.id_perusahaan
+  LEFT JOIN pengguna u ON u.id_pengguna = c.id_perusahaan  -- Join dengan tabel pengguna untuk mendapatkan foto profil
+  WHERE p.id_pekerjaan = ?";
+
 
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $id_pekerjaan);
@@ -45,7 +48,6 @@ if (isset($_GET['id_pekerjaan']) && intval($_GET['id_pekerjaan'])) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -57,6 +59,7 @@ if (isset($_GET['id_pekerjaan']) && intval($_GET['id_pekerjaan'])) {
     <meta content="" name="description">
 
     <link href="img/favicon.ico" rel="icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -72,7 +75,23 @@ if (isset($_GET['id_pekerjaan']) && intval($_GET['id_pekerjaan'])) {
 
     <link href="css/style.css" rel="stylesheet">
 </head>
+<style>
+body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #f4f4f9;
+        }
+        
+/* Tombol Pekerjaan Sesuai dengan Tema */
+.btn-primary {
+    background-color: #6A9C89; /* Warna tombol sesuai tema */
+    border-color: #6A9C89; /* Warna border tombol */
+}
 
+.btn-primary:hover {
+    background-color: #5b876f; /* Warna tombol saat hover */
+    border-color: #5b876f; /* Warna border saat hover */
+}
+        </style>
 <body>
     <div class="container-xxl bg-white p-0">
         <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
@@ -80,17 +99,16 @@ if (isset($_GET['id_pekerjaan']) && intval($_GET['id_pekerjaan'])) {
                 <span class="sr-only">Loading...</span>
             </div>
         </div>
+        </div>
 
         <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-                <a href="index_2.html" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
-                    <h1 class="m-0" style="color: #16423C;">LookWork</h1>
-                </a>
-        
-                <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                
-                <div class="collapse navbar-collapse" id="navbarCollapse">
+       <a href="indexx.php" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
+       <h1 class="m-0" style="color: #16423C;">LookWork</h1>
+       </a>
+            <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
                     <!-- Navigasi di kiri -->
                     <div class="navbar-nav me-auto p-4 p-lg-0">
                         <a href="indexx.php#beranda" class="nav-item nav-link ">Beranda</a>
@@ -102,42 +120,35 @@ if (isset($_GET['id_pekerjaan']) && intval($_GET['id_pekerjaan'])) {
                         <a href="notifikasi.php" class="nav-item nav-link">Notifikasi</a>
                         <?php endif; ?>
 
-                        <a href="#kontak" class="nav-item nav-link">Kontak</a>
                     </div>
                     
                     <!-- Tombol di kanan -->
-                    <?php if(isset($_SESSION['username'])): ?>
-                        <div class="dropdown">
-                            <a href="#" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block dropdown-toggle" style="background-color: #6A9C89; border-color: #6A9C89;" data-bs-toggle="dropdown" aria-expanded="false">
-                                <?= $_SESSION['username']; ?>
-                            </a>
-                            <ul class="dropdown-menu position-relative">
-                                <li><a class="dropdown-item" href="profil.php">Profil</a></li>
-                                <li><a class="dropdown-item" href="../login/logout.php">Keluar</a></li>
-                            </ul>
-                        </div>
-                        <?php else: ?>
-                        <a href="../login/login.php" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block" style="background-color: #6A9C89; border-color: #6A9C89;">
-                            Mulai Karirmu!<i class="fa fa-arrow-right ms-3"></i>
-                        </a>
-                        <?php endif; ?>
+                    <?php if (isset($_SESSION['username'])): ?>
+                <div class="dropdown">
+                    <a href="#" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block dropdown-toggle" style="background-color: #6A9C89; border-color: #6A9C89;" data-bs-toggle="dropdown">
+                        <?= $_SESSION['username']; ?>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="profil.php">Profil</a></li>
+                        <li><a class="dropdown-item" href="logout.php">Keluar</a></li>
+                    </ul>
+                </div>
+            <?php endif; ?>
 
-            </div>
         </nav>
+        <!-- Navbar End -->
  
         <div class="container my-4">
-        <div class="row">
-    <div class="col-md-8">
-        <!-- Menampilkan detail pekerjaan -->
-        <div class="job-item p-4 border rounded">
-            <div class="d-flex">
-                <!-- Menampilkan gambar pekerjaan atau logo default -->
-                <img class="img-fluid rounded" src="img/<?= isset($job['logo']) && $job['logo'] ? htmlspecialchars($job['logo']) : 'default-job.png'; ?>" alt="<?= htmlspecialchars($job['judul_pekerjaan']); ?>" style="width: 100px; height: 100px;">
-                <div class="ms-3">
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Menampilkan detail pekerjaan dengan background putih dan border radius yang lebih halus -->
+            <div class="job-item p-4 border rounded" style="background-color: #ffffff; border-radius: 15px;">
+                <div class="d-flex flex-column">
+                    <!-- Menampilkan gambar pekerjaan atau logo default -->
                     <h3><?= htmlspecialchars($job['judul_pekerjaan']); ?></h3>
                     <p class="mb-1"><i class="fa fa-map-marker-alt text-primary"></i> <?= htmlspecialchars($job['lokasi']); ?></p>
-                    <p class="mb-1"><i class="fa fa-clock text-primary"></i> <?= ucfirst(htmlspecialchars($job['jenis_pekerjaan'])); ?></p>
-                    <p class="mb-1"><i class="fa fa-laptop-house text-primary"></i> <?= ucfirst(htmlspecialchars($job['tipe_kerja'])); ?></p>
+                    <p class="mb-1"><i class="fa fa-clock text-primary"></i> <?= htmlspecialchars($job['jenis_pekerjaan']); ?></p>
+                    <p class="mb-1"><i class="fa fa-briefcase text-primary"></i> <?= htmlspecialchars($job['tipe_kerja']); ?></p>
                     <p class="mb-1">
                         <i class="fa fa-money-bill-alt text-primary"></i> 
                         <?php 
@@ -163,64 +174,31 @@ if (isset($_GET['id_pekerjaan']) && intval($_GET['id_pekerjaan'])) {
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Menampilkan detail perusahaan -->
-    <div class="col-md-4">
-        <div class="p-4 border rounded">
-            <h5 class="mb-4">Perusahaan</h5>
-            <p><strong><?= htmlspecialchars($job['nama_perusahaan']); ?></strong></p>
-            <p><i class="fa fa-map-marker-alt text-primary"></i> <?= htmlspecialchars($job['lokasi_perusahaan']); ?></p>
-            <p><strong>Deskripsi Perusahaan:</strong></p>
-            <p><?= nl2br(htmlspecialchars($job['deskripsi_perusahaan'])); ?></p>
-            <a href="profil_perusahaan.php?id_perusahaan=<?= $job['id_perusahaan']; ?>" class="btn btn-primary">Lihat Perusahaan</a>
+        <!-- Menampilkan detail perusahaan di kolom kanan -->
+        <div class="col-md-4">
+            <div class="job-item p-4 border rounded" style="background-color: #ffffff; border-radius: 15px;">
+                <h4>Profil Perusahaan</h4>
+                <div class="d-flex align-items-center mb-3">
+                    <!-- Menampilkan foto profil perusahaan -->
+                    <?php if (!empty($job['foto_profil'])): ?>
+                        <img src="../foto/<?= htmlspecialchars($job['foto_profil']); ?>" class="img-fluid" style="max-width: 150px; max-height: 150px; border-radius: 50%;">
+                    <?php else: ?>
+                        <img src="../imgbk/default.png" class="img-fluid" style="max-width: 150px; max-height: 150px; border-radius: 50%;">
+                    <?php endif; ?>
+                </div>
+                <p><strong>Nama Perusahaan:</strong> <?= htmlspecialchars($job['nama_perusahaan']); ?></p>
+                <p><strong>Lokasi Perusahaan:</strong> <?= htmlspecialchars($job['lokasi_perusahaan']); ?></p>
+                <p><strong>Deskripsi:</strong> <?= nl2br(htmlspecialchars($job['deskripsi_perusahaan'])); ?></p>
+            </div>
         </div>
     </div>
 </div>
-</div>
-    </div>
 
 
-
-        
-
-                <!-- Footer  -->
-                <?php
-                $no_wa = 6282266479716;
-                ?>
-                <div id="kontak" class="container-fluid bg-dark text-white-50 footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">
-                    <div class="container py-5">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-3 col-md-6 text-center">
-                                <h5 class="text-white mb-4">Kontak</h5>
-                                <p class="mb-2">
-                                    <a href="https://www.instagram.com/lookwork__/" target="_blank" class="text-white-50">
-                                        <i class="fab fa-instagram me-3"></i>Instagram : @lookwork__
-                                    </a>
-                                </p>
-                                <p class="mb-2">
-                                    <a href="https://wa.me/<?php echo $no_wa; ?>?text=Halo%20saya%20ingin%20bertanya" target="_blank" class="text-white-50">
-                                        <i class="fa fa-phone-alt me-3"></i>WhatsApp: +6282266479716
-                                    </a>
-                                </p>
-                                <p class="mb-2">
-                                    <a href="mailto:custsercices@lookwork.com?subject=Subject%20Anda&body=Halo,%20saya%20ingin%20bertanya." target="_blank" class="text-white-50">
-                                        <i class="fa fa-envelope me-3"></i>Email: info@lookwork.com
-                                    </a>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Footer End -->
-        
-        
-                <!-- Back to Top -->
-                <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
-            </div>
-        
-            <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+           
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
             <script src="lib/wow/wow.min.js"></script>
             <script src="lib/easing/easing.min.js"></script>

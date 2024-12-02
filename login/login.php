@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } elseif ($row['peran'] == 'perusahaan') {
                 header("Location: ../perusahaan/index.php");
             } elseif ($row['peran'] == 'admin') {
-                header("Location: admin/index.php");
+                header("Location: ../admin/index.php");
             }
             exit();
         } else {
@@ -59,40 +59,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - LookWork</title>
+    <!-- Link ke file CSS eksternal -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="sign-in.css">
-    <style>
-        body { display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .login-form { width: 400px; padding: 40px; background: #fff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-        .password-wrapper { position: relative; }
-        .password-wrapper i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #16423C; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="login-form">
-        <h2 style="color : #16423C"><b>Login LookWork</b></h2>
+        <h2><b>LookWork</b></h2>
         <br/>
         <?php if (isset($error)) { ?>
             <div class="alert alert-danger"><?php echo $error; ?></div>
         <?php } ?>
         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
             <div class="form-group">
-                <label for="email" style="color : #16423C">Email:</label>
-                <input type="email" class="form-control" id="email" name="email" required>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
             </div>
             <div class="form-group password-wrapper">
-                <label for="password" style="color : #16423C">Password:</label>
-                <input type="password" class="form-control" id="password" name="password" required>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
                 <i class="fas fa-eye" id="togglePassword"></i>
             </div>
-            <p class="text-left mt-3"> <a href="forgotpass.php">Lupa password?</a></p>
-            <button type="submit" class="btn btn-info btn-block">Login</button>
+            <p class="text-left mt-3"><a href="forgotpass.php">Lupa Sandi?</a></p>
+            <button type="submit" class="btn btn-block">Login</button>
         </form>
-        <p class="text-center mt-3">Belum punya akun? <a href="register.php">Register</a></p>
+        <p class="text-center mt-3">Belum punya akun? <a href="register.php">Daftar</a></p>
     </div>
 
     <script>
@@ -107,3 +102,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </script>
 </body>
 </html>
+
+
+

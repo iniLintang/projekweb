@@ -1,6 +1,57 @@
 <?php
-session_start();
+session_start(); // Memulai sesi
+
+// Konfigurasi database
+$host = 'localhost';
+$dbname = 'lookwork2';
+$username = 'root';
+$password = '';
+
+try {
+    // Membuat koneksi database menggunakan PDO
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Koneksi gagal: " . $e->getMessage());
+}
+
+// Pastikan pengguna yang melihat adalah perusahaan
+if (!isset($_SESSION['pengguna_id']) || $_SESSION['peran'] !== 'perusahaan') {
+    die("Anda tidak memiliki akses untuk melihat halaman ini.");
+}
+
+// Mendapatkan ID pengguna (pencari kerja) yang ingin dilihat
+if (!isset($_GET['id_pengguna'])) {
+    die("ID pengguna tidak ditemukan.");
+}
+
+$id_pengguna = $_GET['id_pengguna'];
+
+// Mengambil data profil pengguna
+$stmt = $pdo->prepare("SELECT * FROM pengguna WHERE id_pengguna = :id_pengguna AND peran = 'pencari_kerja'");
+$stmt->execute(['id_pengguna' => $id_pengguna]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$user) {
+    die("Profil pengguna tidak ditemukan.");
+}
+
+// Mengambil data pengalaman
+$stmt = $pdo->prepare("SELECT * FROM pengalaman WHERE id_pencari_kerja = :id_pencari_kerja");
+$stmt->execute(['id_pencari_kerja' => $id_pengguna]);
+$experiences = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Mengambil data keterampilan
+$stmt = $pdo->prepare("SELECT * FROM keterampilan WHERE id_pencari_kerja = :id_pencari_kerja");
+$stmt->execute(['id_pencari_kerja' => $id_pengguna]);
+$skills = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Mengambil data pendidikan
+$stmt = $pdo->prepare("SELECT * FROM pendidikan WHERE id_pencari_kerja = :id_pencari_kerja");
+$stmt->execute(['id_pencari_kerja' => $id_pengguna]);
+$educations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,26 +73,97 @@ session_start();
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
 </head>
+<style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #f4f4f9;
+    }
 
+            .btn {
+            background-color: #6A9C89;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .profile-img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        transition: transform 0.3s ease;
+    }
+
+    .profile-img:hover {
+        transform: scale(1.1);
+    }
+
+    .profile-card, .experience-card, .skills-card, .education-card {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.6s forwards;
+    }
+
+    .experience-card {
+        animation-delay: 0.2s;
+    }
+
+    .skills-card {
+        animation-delay: 0.4s;
+    }
+
+    .education-card {
+        animation-delay: 0.6s;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    </style>
 </head>
-<body data-bs-spy="scroll" data-bs-target=".navbar" data-bs-offset="70">
+<body>
     <div class="container-xxl bg-white p-0">
+        <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        </div>
 
-
-    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+        <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
        <a href="index.php" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
-    <h1 class="m-0" style="color: #16423C;">LookWork</h1>
-</a>
+       <h1 class="m-0" style="color: #16423C;">LookWork</h1>
+       </a>
 
-            </a>
             <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
-                <div class="navbar-nav ms-auto p-4 p-lg-0">
-                    <a href="index.php" class="nav-item nav-link active">Beranda</a>
+               
+            <div class="navbar-nav ms-auto p-4 p-lg-0">
+                    <a href="index.php" class="nav-item nav-link ">Beranda</a>
                     <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pekerjaan</a>
+                        <a href="#" class="nav-link active dropdown-toggle" data-bs-toggle="dropdown">Pekerjaan</a>
                         <div class="dropdown-menu rounded-0 m-0">
                             <a href="daftar_loker.php" class="dropdown-item">Daftar Lowongan Pekerjaan</a>
                             <a href="daftar_lamaran.php" class="dropdown-item">Daftar Lamaran Pekerjaan</a>
@@ -58,123 +180,84 @@ session_start();
                 </div>
         </nav>
     </div>
-
-    <body>
-        <div class="container my-5">
-            <!-- Profil Pengguna -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3>Profil Pencari Kerja</h3>
-                </div>
-                <div class="card-body d-flex align-items-center">
-                    <img src="<?php echo $user['foto_profil']; ?>" alt="Foto Profil" class="img-thumbnail me-4" style="width: 150px; height: 150px; object-fit: cover;">
-                    <div>
-                        <h4><?php echo $user['nama']; ?></h4>
-                        <p><strong>Email:</strong> <?php echo $user['email']; ?></p>
-                        <p><strong>Keterangan:</strong> <?php echo $user['keterangan']; ?></p>
-                        <a href="<?php echo $user['cv_url']; ?>" class="btn btn-primary btn-sm" target="_blank">Lihat CV</a>
-                    </div>
-                </div>
+        
+    <div class="container my-5">
+        <!-- Profil Pengguna -->
+        <div class="card profile-card mb-4">
+            <div class="card-header">
+                <h3>Profil Pencari Kerja</h3>
             </div>
-    
-            <!-- Pengalaman -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3>Pengalaman</h3>
-                </div>
-                <div class="card-body">
-                    <?php foreach ($experiences as $experience): ?>
-                        <div class="mb-3">
-                            <h5><?php echo $experience['nama_institusi']; ?></h5>
-                            <p><strong>Jenis Pengalaman:</strong> <?php echo ucfirst($experience['jenis_pengalaman']); ?></p>
-                            <p><strong>Periode:</strong> <?php echo date('d M Y', strtotime($experience['tanggal_mulai'])); ?> - <?php echo date('d M Y', strtotime($experience['tanggal_selesai'])); ?></p>
-                            <p><strong>Deskripsi:</strong> <?php echo $experience['deskripsi_pengalaman']; ?></p>
-                        </div>
-                        <hr>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-    
-            <!-- Keterampilan -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3>Keterampilan</h3>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group">
-                        <?php foreach ($skills as $skill): ?>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <?php echo $skill['nama_keterampilan']; ?>
-                                <a href="<?php echo $skill['sertifikat_url']; ?>" target="_blank" class="btn btn-outline-primary btn-sm">Lihat Sertifikat</a>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            </div>
-    
-            <!-- Pendidikan -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3>Pendidikan</h3>
-                </div>
-                <div class="card-body">
-                    <?php foreach ($educations as $education): ?>
-                        <div class="mb-3">
-                            <h5><?php echo $education['institusi']; ?></h5>
-                            <p><strong>Gelar:</strong> <?php echo $education['gelar']; ?> (<?php echo $education['bidang_studi']; ?>)</p>
-                            <p><strong>Periode:</strong> <?php echo $education['tahun_mulai']; ?> - <?php echo $education['tahun_selesai']; ?></p>
-                        </div>
-                        <hr>
-                    <?php endforeach; ?>
+            <div class="card-body d-flex align-items-center">
+                <img src="<?php echo htmlspecialchars($user['foto_profil']); ?>" alt="Foto Profil" class="img-thumbnail profile-img me-4">
+                <div>
+                    <h4><?php echo htmlspecialchars($user['nama']); ?></h4>
+                    <p><strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?></p>
+                    <p><strong>Username:</strong> <?php echo htmlspecialchars($user['username']); ?></p>
                 </div>
             </div>
         </div>
-
-           
-        <!-- Footer  -->
-        <?php
-        $no_wa = 6282266479716;
-        ?>
-        <div id="kontak" class="container-fluid bg-dark text-white-50 footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">
-            <div class="container py-5">
-                <div class="row justify-content-center">
-                    <div class="col-lg-3 col-md-6 text-center">
-                        <h5 class="text-white mb-4">Kontak</h5>
-                        <p class="mb-2">
-                            <a href="https://www.instagram.com/lookwork__/" target="_blank" class="text-white-50">
-                                <i class="fab fa-instagram me-3"></i>Instagram : @lookwork__
-                            </a>
-                        </p>
-                        <p class="mb-2">
-                            <a href="https://wa.me/<?php echo $no_wa; ?>?text=Halo%20saya%20ingin%20bertanya" target="_blank" class="text-white-50">
-                                <i class="fa fa-phone-alt me-3"></i>WhatsApp: +6282266479716
-                            </a>
-                        </p>
-                        <p class="mb-2">
-                            <a href="mailto:custsercices@lookwork.com?subject=Subject%20Anda&body=Halo,%20saya%20ingin%20bertanya." target="_blank" class="text-white-50">
-                                <i class="fa fa-envelope me-3"></i>Email: info@lookwork.com
-                            </a>
-                        </p>
+    
+        <!-- Pengalaman -->
+        <div class="card mb-4 experience-card">
+            <div class="card-header">
+                <h3>Pengalaman</h3>
+            </div>
+            <div class="card-body">
+                <?php foreach ($experiences as $experience): ?>
+                    <div class="mb-3">
+                        <h5><?php echo htmlspecialchars($experience['nama_institusi']); ?></h5>
+                        <p><strong>Jenis Pengalaman:</strong> <?php echo ucfirst(htmlspecialchars($experience['jenis_pengalaman'])); ?></p>
+                        <p><strong>Periode:</strong> <?php echo date('d M Y', strtotime($experience['tanggal_mulai'])); ?> - <?php echo date('d M Y', strtotime($experience['tanggal_selesai'])); ?></p>
+                        <p><strong>Deskripsi:</strong> <?php echo htmlspecialchars($experience['deskripsi_pengalaman']); ?></p>
                     </div>
-                </div>
+                    <hr>
+                <?php endforeach; ?>
             </div>
         </div>
-
-        <!-- Footer End -->
-
-<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    
+        <!-- Keterampilan -->
+        <div class="card mb-4 skills-card">
+            <div class="card-header">
+                <h3>Keterampilan</h3>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <?php foreach ($skills as $skill): ?>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <?php echo htmlspecialchars($skill['nama_keterampilan']); ?>
+                            <?php if (!empty($skill['sertifikat_url'])): ?>
+                                <a href="<?php echo htmlspecialchars($skill['sertifikat_url']); ?>" target="_blank" class="btn btn-outline-primary btn-sm">Lihat Sertifikat</a>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+    
+        <!-- Pendidikan -->
+        <div class="card mb-4 education-card">
+            <div class="card-header">
+                <h3>Pendidikan</h3>
+            </div>
+            <div class="card-body">
+                <?php foreach ($educations as $education): ?>
+                    <div class="mb-3">
+                        <h5><?php echo htmlspecialchars($education['institusi']); ?></h5>
+                        <p><strong>Gelar:</strong> <?php echo htmlspecialchars($education['gelar']); ?> (<?php echo htmlspecialchars($education['bidang_studi']); ?>)</p>
+                        <p><strong>Periode:</strong> <?php echo htmlspecialchars($education['tahun_mulai']); ?> - <?php echo htmlspecialchars($education['tahun_selesai']); ?></p>
+                    </div>
+                    <hr>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+    <!-- JS Files -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="lib/wow/wow.min.js"></script>
     <script src="lib/easing/easing.min.js"></script>
     <script src="lib/waypoints/waypoints.min.js"></script>
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-
     <script src="js/main.js"></script>
-    
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 </body>
-
 </html>

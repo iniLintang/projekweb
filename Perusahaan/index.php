@@ -1,6 +1,7 @@
 <?php
 session_start();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,22 +13,22 @@ session_start();
     <meta content="" name="description">
 
     <link href="img/favicon.ico" rel="icon">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Inter:wght@700;800&display=swap" rel="stylesheet">
-    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
     <link href="lib/animate/animate.min.css" rel="stylesheet">
     <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-
     <link href="css/bootstrap.min.css" rel="stylesheet">
-
     <link href="css/style.css" rel="stylesheet">
 </head>
-
+<style>
+    body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #f4f4f9;
+    }
+            </style>
 <body>
     <div class="container-xxl bg-white p-0">
         <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
@@ -35,17 +36,20 @@ session_start();
                 <span class="sr-only">Loading...</span>
             </div>
         </div>
+        </div>
 
-       <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+        <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
        <a href="index.php" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
-                <h1 class="m-0 text-primary">LookWork</h1>
-            </a>
+       <h1 class="m-0" style="color: #16423C;">LookWork</h1>
+       </a>
+
             <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
-                <div class="navbar-nav ms-auto p-4 p-lg-0">
-                    <a href="index.php" class="nav-item nav-link active">Beranda</a>
+               
+            <div class="navbar-nav ms-auto p-4 p-lg-0">
+                    <a href="index.php" class="nav-item active nav-link ">Beranda</a>
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pekerjaan</a>
                         <div class="dropdown-menu rounded-0 m-0">
@@ -57,11 +61,11 @@ session_start();
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Profil</a>
                         <div class="dropdown-menu rounded-0 m-0">
                             <a href="pengaturan_profil.php" class="dropdown-item">Pengaturan Profil</a>
-                            <a href="../login/logout.php" class="dropdown-item">Keluar</a>
+                            <a href="keluar.php" class="dropdown-item">Keluar</a>
                         </div>
                 </div>
-                <a href="tambah_pekerjaan.php" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block">Tambahkan Loker<i class="fa fa-arrow-right ms-3"></i></a>
-            </div>
+                <a href="tambah_pekerjaan.php" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block" style="background-color: #6A9C89; border-color: #6A9C89;">Tambahkan Loker<i class="fa fa-arrow-right ms-3"></i></a>
+                </div>
         </nav>
     </div>
 
@@ -187,9 +191,6 @@ session_start();
     <script src="js/main.js"></script>
     
     <script src="js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
 </body>
 
 </html>
