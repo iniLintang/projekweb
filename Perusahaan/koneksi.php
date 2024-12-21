@@ -1,13 +1,13 @@
 <?php
 // Database connection settings
-$host = 'localhost';   // Your database host
-$dbname = 'lookwork2';   // Your database name
-$username = 'root';   // Your database username
-$password = '';   // Your database password
+$server = "wstif23.myhost.id";
+$user = "wstifmy1_kelas_int";
+$password = "@Polije164Int";
+$nama_database = "wstifmy1_int_team3";
 
 try {
     // Create a new PDO connection
-    $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $conn = new PDO("mysql:host=$server;dbname=$nama_database", $user, $password);
     
     // Set the PDO error mode to exception
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -20,3 +20,4 @@ try {
     exit;
 }
 ?>
+

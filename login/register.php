@@ -2,79 +2,90 @@
 session_start();
 
 // Konfigurasi database
-$host = "localhost"; 
-$username_db = "root"; 
-$password_db = ""; 
-$database = "lookwork2";  
+$server = "wstif23.myhost.id";
+$user = "wstifmy1_kelas_int";
+$password = "@Polije164Int";
+$nama_database = "wstifmy1_int_team3";
 
-// Membuat koneksi ke database
-$conn = new mysqli($host, $username_db, $password_db, $database);
+// Buat koneksi
+$db = new mysqli($server, $user, $password, $nama_database);
 
 // Memeriksa koneksi
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
+if ($db->connect_error) {
+    die("Koneksi gagal: " . $db->connect_error);
 }
 
 // Menangani proses registrasi saat form disubmit
+$error = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
-    $nama = $_POST['full_name'];
-    $email = $_POST['email'];
+    $username = trim($_POST['username']);
+    $nama = trim($_POST['full_name']);
+    $email = trim($_POST['email']);
     $kata_sandi = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
-    $peran = $_POST['peran']; // Peran ditambahkan untuk menentukan jenis pengguna
+    $peran = $_POST['peran'];
 
-    // Mencegah SQL Injection
-    $username = mysqli_real_escape_string($conn, $username);
-    $nama = mysqli_real_escape_string($conn, $nama);
-    $email = mysqli_real_escape_string($conn, $email);
-
-    // Memeriksa apakah username atau email sudah ada di database
-    $sql = "SELECT * FROM pengguna WHERE username = ? OR email = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $username, $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $error = "Username atau Email sudah terpakai!";
+    // Validasi input
+    if (empty($username) || empty($nama) || empty($email) || empty($kata_sandi) || empty($confirm_password)) {
+        $error = "Semua kolom harus diisi!";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Format email tidak valid!";
+    } elseif ($kata_sandi !== $confirm_password) {
+        $error = "Password dan konfirmasi password tidak cocok!";
     } else {
-        // Memeriksa apakah password dan konfirmasi password cocok
-        if ($kata_sandi === $confirm_password) {
+        // Memeriksa apakah username atau email sudah ada di database
+        $sql = "SELECT * FROM pengguna WHERE username = ? OR email = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param("ss", $username, $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $error = "Username atau Email sudah terpakai!";
+            echo "<script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Peringatan',
+                        text: '$error',
+                        confirmButtonText: 'OK',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    });
+                });
+            </script>";
+        } else {
             // Meng-hash password
             $hashed_password = password_hash($kata_sandi, PASSWORD_DEFAULT);
 
-            // Query untuk menyimpan data pengguna ke tabel pengguna
+            // Query untuk menyimpan data pengguna
             $sql = "INSERT INTO pengguna (username, nama, email, kata_sandi, peran) VALUES (?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
+            $stmt = $db->prepare($sql);
             $stmt->bind_param("sssss", $username, $nama, $email, $hashed_password, $peran);
 
             if ($stmt->execute()) {
-                // Ambil id_pengguna yang baru saja diinsert
-                $id_pengguna = $conn->insert_id;
+                $id_pengguna = $db->insert_id;
 
-                // Masukkan data ke tabel pencari_kerja atau perusahaan sesuai dengan peran
+                // Masukkan data ke tabel sesuai peran
                 if ($peran == 'pencari_kerja') {
                     $sql_pencari_kerja = "INSERT INTO pencari_kerja (id_pengguna) VALUES (?)";
-                    $stmt_pencari_kerja = $conn->prepare($sql_pencari_kerja);
+                    $stmt_pencari_kerja = $db->prepare($sql_pencari_kerja);
                     $stmt_pencari_kerja->bind_param("i", $id_pengguna);
                     $stmt_pencari_kerja->execute();
                 } elseif ($peran == 'perusahaan') {
-                    $nama_perusahaan = $_POST['nama_perusahaan']; // Menambahkan nama perusahaan
+                    $nama_perusahaan = trim($_POST['nama_perusahaan']);
                     $sql_perusahaan = "INSERT INTO perusahaan (id_pengguna, nama_perusahaan) VALUES (?, ?)";
-                    $stmt_perusahaan = $conn->prepare($sql_perusahaan);
+                    $stmt_perusahaan = $db->prepare($sql_perusahaan);
                     $stmt_perusahaan->bind_param("is", $id_pengguna, $nama_perusahaan);
                     $stmt_perusahaan->execute();
                 }
 
-                // Redirect ke halaman login setelah berhasil registrasi
+                // Redirect ke halaman login
                 header("Location: login.php");
                 exit();
             } else {
-                $error = "Terjadi kesalahan: " . $conn->error;
+                $error = "Terjadi kesalahan: " . $db->error;
             }
-        } else {
-            $error = "Password dan konfirmasi password tidak cocok!";
         }
     }
 }
@@ -149,5 +160,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             perusahaanField.style.display = this.value === 'perusahaan' ? 'block' : 'none';
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </body>
 </html>

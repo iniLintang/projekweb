@@ -1,11 +1,13 @@
 <?php
 // Konfigurasi koneksi database
-$host = 'localhost'; // Host database
-$user = 'root';      // Username database
-$password = '';      // Password database
-$dbname = 'lookwork2'; // Nama database
+$server = "wstif23.myhost.id";
+$user = "wstifmy1_kelas_int";
+$password = "@Polije164Int";
+$nama_database = "wstifmy1_int_team3";
 
-$conn = new mysqli($host, $user, $password, $dbname);
+
+// Buat koneksi
+$conn = new mysqli($server, $user, $password, $nama_database);
 
 // Cek koneksi
 if ($conn->connect_error) {
@@ -50,7 +52,7 @@ $result = $stmt->get_result();
 ?>
 <head>
     <meta charset="utf-8">
-    <title>PencariKerja_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -160,7 +162,7 @@ $result = $stmt->get_result();
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>#</th>
+                <th>No</th>
                 <th>Pekerjaan</th>
                 <th>Status</th>
                 <th>Deskripsi</th>

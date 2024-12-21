@@ -1,10 +1,12 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "lookwork2";
+$server = "wstif23.myhost.id";
+$user = "wstifmy1_kelas_int";
+$password = "@Polije164Int";
+$nama_database = "wstifmy1_int_team3";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Buat koneksi
+$conn = new mysqli($server, $user, $password, $nama_database);
 
 if ($conn->connect_error) {
     die("Koneksi gagal: " . $conn->connect_error);

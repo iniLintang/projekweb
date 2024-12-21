@@ -4,17 +4,24 @@ session_start();
 include 'db_connect.php';
 
 try {
-    // Query untuk mendapatkan semua data perusahaan dengan tanggal_dibuat dari tabel pengguna
-    $query = "
-        SELECT perusahaan.*, pengguna.tanggal_dibuat 
-        FROM perusahaan 
-        JOIN pengguna ON perusahaan.id_pengguna = pengguna.id_pengguna 
-        ORDER BY pengguna.tanggal_dibuat DESC
-    ";
-    
+    // Query untuk mendapatkan semua data perusahaan dengan tanggal_dibuat dan foto_profil dari tabel pengguna
+    $query = "SELECT 
+    p.id_perusahaan, 
+    p.id_pengguna, 
+    p.lokasi_perusahaan, 
+    p.industri, 
+    p.deskripsi_perusahaan, 
+    u.nama, 
+    u.foto_profil, 
+    u.tanggal_dibuat 
+FROM perusahaan p
+LEFT JOIN pengguna u ON p.id_pengguna = u.id_pengguna";
+  
+
+
     $result = $conn->query($query);
 
-    // Mengecek apakah ada data yang ditemukan
+    // Mengecek apakah query berhasil dijalankan
     if (!$result) {
         throw new Exception("Query error: " . $conn->error);
     }
@@ -28,7 +35,7 @@ try {
 
 <head>
     <meta charset="utf-8">
-    <title>PencariKerja_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -203,7 +210,7 @@ body {
                     <!-- Tombol Cari -->
                     <div class="col-md-2 text-center">
                         <button type="submit" class="btn btn-primary w-100">Cari Perusahaan</button>
-                    </div>
+                    </div>  
                 </form>
             </div>
 
@@ -212,23 +219,42 @@ body {
     <div class="row">
         <?php if ($result && $result->num_rows > 0): ?>
             <?php while ($company = $result->fetch_assoc()): ?>
-                <div class="col-md-4 mb-4"> <!-- Ubah ukuran kolom menjadi lebih kecil agar lebih rapat -->
+                <div class="col-md-4 mb-4">
                     <div class="company-item p-4 border rounded shadow-sm transition-all" style="min-height: 250px; display: flex; flex-direction: column; justify-content: space-between;">
                         <div class="d-flex align-items-center">
-                           <img src="../foto/<?= !empty($company['foto_profil']) ? htmlspecialchars($company['foto_profil']) : '../imgbk/default.png'; ?>" 
-                                        class="img-fluid rounded-circle" 
-                                        style="width: 100px; height: 100px; object-fit: cover;">
+
+                        <?php
+                        // Query untuk mendapatkan detail pengguna berdasarkan id_pengguna
+                        $query_user = "SELECT * FROM pengguna WHERE id_pengguna = ?";
+                        $stmt_user = $conn->prepare($query_user);
+                        $stmt_user->bind_param("i", $company['id_pengguna']);
+                        $stmt_user->execute();
+                        $result_user = $stmt_user->get_result();
+                        $user = $result_user->fetch_assoc();
+                        ?>
+
+                        <div class="d-flex align-items-center mb-3">            
+                                    <!-- Menampilkan foto profil pengguna (pemilik perusahaan) -->
+                                    <div class="profile-container">
+                                        <?php if (!empty($user['foto_profil'])): ?>
+                                            <img class="img-fluid rounded" src="../foto/<?= htmlspecialchars($user['foto_profil']); ?>" alt="<?= htmlspecialchars($user['nama']); ?>">
+                                        <?php else: ?>
+                                            <img src="../imgbk/default_logo.png" class="img-fluid rounded">
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <!-- Menampilkan foto profil perusahaan -->
 
                             <div class="ms-3">
-                                <h5 class="fw-bold"><?= $company['nama_perusahaan']; ?></h5>
-                                <p class="mb-1 text-muted"><i class="fa fa-map-marker-alt text-primary"></i> <?= $company['lokasi_perusahaan']; ?></p>
-                                <p class="mb-1 text-muted"><i class="fa fa-building text-primary"></i> <?= $company['industri']; ?></p>
+                                <h5 class="fw-bold"><?= htmlspecialchars($company['nama_perusahaan']); ?></h5>
+                                <p class="mb-1 text-muted"><i class="fa fa-map-marker-alt text-primary"></i> <?= htmlspecialchars($company['lokasi_perusahaan']); ?></p>
+                                <p class="mb-1 text-muted"><i class="fa fa-building text-primary"></i> <?= htmlspecialchars($company['industri']); ?></p>
                             </div>
                         </div>
 
                         <!-- Tombol dan Tanggal Bergabung di bagian bawah -->
                         <div class="d-flex flex-column align-items-end">
-                            <a href="profil_perusahaan.php?id_perusahaan=<?= $company['id_perusahaan']; ?>" class="btn btn-primary">Lihat Profil</a>
+                            <a href="profil_perusahaan.php?id_perusahaan=<?= htmlspecialchars($company['id_perusahaan']); ?>" class="btn btn-primary">Lihat Profil</a>
                             <small class="text-truncate mt-2"><i class="fa fa-calendar-alt text-primary"></i> Bergabung sejak: <?= date('d M, Y', strtotime($company['tanggal_dibuat'])); ?></small>
                         </div>
                     </div>
@@ -239,6 +265,10 @@ body {
         <?php endif; ?>
     </div>
 </div>
+
+
+
+
 
 
 

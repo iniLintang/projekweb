@@ -46,6 +46,7 @@ if ($id_pekerjaan) {
             l.status, 
             l.surat_lamaran, 
             l.cv, 
+            l.link,
             l.deskripsi, 
             p.judul_pekerjaan, 
             u.nama AS nama_pencari, 
@@ -83,7 +84,8 @@ $query = $conn->prepare("
         l.id_lamaran, 
         l.status, 
         l.surat_lamaran, 
-        l.cv, 
+        l.cv,
+         l.link, 
         l.deskripsi, 
         p.judul_pekerjaan, 
         u.nama AS nama_pencari, 
@@ -128,7 +130,7 @@ if (isset($_POST['update_deskripsi'])) {
 
 <head>
     <meta charset="utf-8">
-    <title>Perusahaan_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -242,6 +244,7 @@ if (isset($_POST['update_deskripsi'])) {
                 <th>Status</th>
                 <th>Surat Lamaran</th>
                 <th>CV</th>
+                <th>Link G-Drive</th>
                 <th>Deskripsi</th>
                 <th>Opsi</th>
             </tr>
@@ -269,6 +272,7 @@ if (isset($_POST['update_deskripsi'])) {
                             <span>Belum diunggah</span>
                         <?php endif; ?>
                     </td>
+                    <td><?= htmlspecialchars($data['link']); ?></td>
                     <td><?= nl2br(htmlspecialchars($data['deskripsi'])); ?></td>
                     <td>
                         <form method="POST">

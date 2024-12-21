@@ -6,7 +6,7 @@ session_start();
 
 <head>
     <meta charset="utf-8">
-    <title>PencariKerja_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -98,48 +98,44 @@ session_start();
 
 
         <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-       <a href="indexx.php" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
-       <h1 class="m-0" style="color: #16423C;">LookWork</h1>
-       </a>
-            <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <!-- Navigasi di kiri -->
-                    <div class="navbar-nav me-auto p-4 p-lg-0">
-                        <a href="indexx.php#beranda" class="nav-item nav-link ">Beranda</a>
-                        <a href="indexx.php#tentang" class="nav-item nav-link">Tentang</a>
-        
-                        <?php if(isset($_SESSION['username']) && $_SESSION['peran'] === 'pencari_kerja'): ?>
-                        <a href="daftar_pekerjaan.php" class="nav-item nav-link ">Pekerjaan</a>
-                        <a href="daftar_perusahaan.php" class="nav-item nav-link">Perusahaan</a>
-                        <a href="notifikasi.php" class="nav-item nav-link">Notifikasi</a>
-                        <?php endif; ?>
+    <a href="indexx.php" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
+        <h1 class="m-0" style="color: #16423C;">LookWork</h1>
+    </a>
+    <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <!-- Navigasi di kiri -->
+        <div class="navbar-nav me-auto p-4 p-lg-0">
+            <a href="indexx.php#beranda" class="nav-item nav-link ">Beranda</a>
+            <a href="indexx.php#tentang" class="nav-item nav-link">Tentang</a>
 
-                    </div>
-                    
-                    <!-- Tombol di kanan -->
-                    <?php if(isset($_SESSION['username'])): ?>
-                        <div class="dropdown">
-                            <a href="#" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block dropdown-toggle" style="background-color: #6A9C89; border-color: #6A9C89;" data-bs-toggle="dropdown" aria-expanded="false">
-                                <?= $_SESSION['username']; ?>
-                            </a>
-                            <ul class="dropdown-menu position-relative">
-                                <li><a class="dropdown-item" href="profil.php">Profil</a></li>
-                                <li><a class="dropdown-item" href="../login/logout.php">Keluar</a></li>
-                            </ul>
-                        </div>
-                        <?php else: ?>
-                        <a href="../login/login.php" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block" style="background-color: #6A9C89; border-color: #6A9C89;">
-                            Mulai Karirmu!<i class="fa fa-arrow-right ms-3"></i>
-                        </a>
-                        <?php endif; ?>
-
-        </nav>
-        <!-- Navbar End -->
-        </div>
+            <?php if(isset($_SESSION['username']) && $_SESSION['peran'] === 'pencari_kerja'): ?>
+                <a href="daftar_pekerjaan.php" class="nav-item nav-link ">Pekerjaan</a>
+                <a href="daftar_perusahaan.php" class="nav-item nav-link">Perusahaan</a>
+                <a href="notifikasi.php" class="nav-item nav-link">Notifikasi</a>
+            <?php endif; ?>
         </div>
 
+        <!-- Tombol di kanan -->
+        <?php if(isset($_SESSION['username'])): ?>
+            <div class="dropdown">
+                <a href="#" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block dropdown-toggle" style="background-color: #6A9C89; border-color: #6A9C89;" data-bs-toggle="dropdown" aria-expanded="false">
+                    <?= $_SESSION['username']; ?>
+                </a>
+                <ul class="dropdown-menu position-absolute">
+                    <li><a class="dropdown-item" href="profil.php">Profil</a></li>
+                    <li><a class="dropdown-item" href="../login/logout.php">Keluar</a></li>
+                </ul>
+            </div>
+        <?php else: ?>
+            <a href="../login/login.php" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block" style="background-color: #6A9C89; border-color: #6A9C89;">
+                Mulai Karirmu!<i class="fa fa-arrow-right ms-3"></i>
+            </a>
+        <?php endif; ?>
+    </div>
+</nav>
 
     <div class="container-fluid p-0" id="beranda">
             <div class="owl-carousel header-carousel position-relative">
@@ -259,10 +255,9 @@ session_start();
             <div class="row g-4">
                 <!-- Kolom untuk logo perusahaan (foto_profil dari pengguna) -->
                 <div class="col-sm-12 col-md-2 d-flex align-items-center justify-content-center">
-                    <!-- Tampilkan foto profil perusahaan -->
-                    <img src="../foto/<?= htmlspecialchars($job['foto_profil']); ?>" 
-                         alt="Foto Profil <?= htmlspecialchars($job['nama_perusahaan']); ?>" 
-                         class="img-fluid rounded-circle" 
+                    <!-- Menampilkan foto profil perusahaan atau gambar default -->
+                    <img src="../foto/<?= !empty($job['foto_profil']) ? htmlspecialchars($job['foto_profil']) : '../imgbk/default_logo.png'; ?>" 
+                         class="img-fluid rounded" 
                          style="width: 100px; height: 100px; object-fit: cover;">
                 </div>
 
@@ -300,18 +295,17 @@ session_start();
     <?php endwhile; ?>
     
     <?php
-if (isset($_SESSION['pengguna_id'])) {
-    echo '<div class="text-center mt-4"> <!-- Tambahkan pembungkus dengan text-center dan mt-4 -->
-            <button class="btn btn-lg btn-primary" onclick="window.location.href=\'daftar_pekerjaan.php\'">Cari Lebih Lanjut</button>
-          </div>';
-} else {
-    echo '<div class="text-center mt-4"> <!-- Tambahkan pembungkus dengan text-center dan mt-4 -->
-            <button class="btn btn-lg btn-primary" onclick="window.location.href=\'../login/login.php\'">Cari Lebih Lanjut</button>
-          </div>';
-}
-?>
+    if (isset($_SESSION['pengguna_id'])) {
+        echo '<div class="text-center mt-4">
+                <button class="btn btn-lg btn-primary" onclick="window.location.href=\'daftar_pekerjaan.php\'">Cari Lebih Lanjut</button>
+              </div>';
+    } else {
+        echo '<div class="text-center mt-4">
+                <button class="btn btn-lg btn-primary" onclick="window.location.href=\'../login/login.php\'">Cari Lebih Lanjut</button>
+              </div>';
+    }
+    ?>
 
-    
     <?php else: ?>
         <p class="text-center">Tidak ada pekerjaan yang tersedia saat ini.</p>
     <?php endif; ?>
@@ -349,8 +343,8 @@ if (isset($_SESSION['pengguna_id'])) {
                                     <!-- Kolom untuk foto profil perusahaan -->
                                     <div class="col-sm-12 col-md-2 d-flex align-items-center justify-content-center">
                                      <!-- Menampilkan foto profil perusahaan atau gambar default -->
-                                    <img src="../foto/<?= !empty($company['foto_profil']) ? htmlspecialchars($company['foto_profil']) : '../imgbk/default.png'; ?>" 
-                                        class="img-fluid rounded-circle" 
+                                    <img src="../foto/<?= !empty($company['foto_profil']) ? htmlspecialchars($company['foto_profil']) : '../imgbk/default_logo.png'; ?>" 
+                                        class="img-fluid rounded" 
                                         style="width: 100px; height: 100px; object-fit: cover;">
                                       </div>
 

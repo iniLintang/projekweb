@@ -31,7 +31,7 @@ if (isset($_GET['id_perusahaan'])) {
 
 <head>
     <meta charset="utf-8">
-    <title>PencariKerja_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -58,30 +58,83 @@ body {
             background-color: #f4f4f9;
         }
         
-/* Tombol Pekerjaan Sesuai dengan Tema */
 .btn-primary {
-    background-color: #6A9C89; /* Warna tombol sesuai tema */
-    border-color: #6A9C89; /* Warna border tombol */
+    background-color: #6A9C89; 
+    border-color: #6A9C89;
 }
 
 .btn-primary:hover {
-    background-color: #5b876f; /* Warna tombol saat hover */
-    border-color: #5b876f; /* Warna border saat hover */
+    background-color: #5b876f; 
+    border-color: #5b876f; 
 }
-/* Smooth Border Radius dan Efek Hover pada job-item */
 .job-item {
-    background-color: #ffffff; /* Warna background putih */
-    border-radius: 10px; /* Membuat sudut sedikit membulat */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Menambahkan bayangan untuk efek kedalaman */
-    padding: 20px; /* Menambahkan jarak di dalam box */
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease; /* Animasi saat hover */
+    background-color: #ffffff; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    padding: 20px; 
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease; 
 }
 
 .job-item:hover {
-    transform: translateY(-5px); /* Efek naik sedikit saat dihover */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Memperkuat bayangan saat hover */
-    border-radius: 12px; /* Menambahkan efek pembulatan lebih besar saat hover */
+    transform: translateY(-5px); 
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+    border-radius: 12px; 
 }
+
+.container .row .col-md-4 {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+}
+
+.container .row .col-md-4 .profile-container {
+    background-color: #f9f9f9; 
+    padding: 15px; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    max-width: 200px; 
+ 
+}
+.profile-container:hover {
+    transform: translateY(-5px); 
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+    border-radius: 12px; 
+}
+.container .row .col-md-4 img {
+    width: 100%; 
+    height: auto; 
+    border-radius: 10px; 
+}
+
+.container .row .col-md-8 {
+    padding-left: 15px; 
+}
+.detail-container {
+    background-color: #ffffff; 
+    padding: 20px; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    margin-top: 20px; 
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease; 
+
+}
+
+.detail-container h2 {
+    color: #333; 
+    font-size: 24px; 
+}
+
+
+.detail-container p {
+    color: #666; 
+    font-size: 16px; 
+}
+.detail-container:hover {
+    transform: translateY(-5px); 
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+    border-radius: 12px; 
+}
+
         </style>
 <body>
     <div class="container-xxl bg-white p-0">
@@ -131,28 +184,45 @@ body {
         <!-- Navbar End -->
 
 <!-- Profil Perusahaan -->
-<div class="container my-4">
-    <div class="row">
-        <div class="col-md-4">
-            <!-- Menampilkan logo perusahaan -->
-            <?php if (!empty($company['logo'])): ?>
-                <img class="img-fluid rounded" src="img/<?= $company['logo']; ?>" alt="<?= $company['nama_perusahaan']; ?>" style="width: 100%; max-width: 200px;">
-            <?php else: ?>
-                <img class="img-fluid rounded" src="img/default-logo.png" alt="Default Logo" style="width: 100%; max-width: 200px;">
-            <?php endif; ?>
-        </div>
-        <div class="col-md-8">
-            <!-- Menampilkan detail perusahaan dengan background -->
-            <div class="p-4 border rounded shadow-sm">
-                <h2><?= !empty($company['nama_perusahaan']) ? $company['nama_perusahaan'] : 'Tidak Tersedia'; ?></h2>
-                <p><strong>Industri:</strong> <?= !empty($company['industri']) ? $company['industri'] : 'Industri tidak tersedia'; ?></p>
-                <p><strong>Lokasi:</strong> <?= !empty($company['lokasi_perusahaan']) ? $company['lokasi_perusahaan'] : 'Lokasi tidak tersedia'; ?></p>
-                <p><strong>Deskripsi:</strong></p>
-                <p><?= !empty($company['deskripsi_perusahaan']) ? nl2br($company['deskripsi_perusahaan']) : 'Tidak ada deskripsi.'; ?></p>
+        <div class="container my-4">
+        <?php
+        // Query untuk mendapatkan detail pengguna berdasarkan id_pengguna
+        $query_user = "SELECT * FROM pengguna WHERE id_pengguna = ?";
+        $stmt_user = $conn->prepare($query_user);
+        $stmt_user->bind_param("i", $company['id_pengguna']);
+        $stmt_user->execute();
+        $result_user = $stmt_user->get_result();
+        $user = $result_user->fetch_assoc();
+        ?>
+
+        <div class="container my-4">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <!-- Menampilkan foto profil pengguna (pemilik perusahaan) -->
+                    <div class="profile-container">
+                        <?php if (!empty($user['foto_profil'])): ?>
+                            <img class="img-fluid rounded" src="../foto/<?= htmlspecialchars($user['foto_profil']); ?>" alt="<?= htmlspecialchars($user['nama']); ?>">
+                        <?php else: ?>
+                            <img src="../imgbk/default_user.png" class="img-fluid rounded" alt="Foto Profil Pengguna">
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <!-- Menampilkan detail perusahaan -->
+                    <div class="detail-container">
+                        <h2><?= !empty($company['nama_perusahaan']) ? $company['nama_perusahaan'] : 'Tidak Tersedia'; ?></h2>
+                        <p><strong>Industri:</strong> <?= !empty($company['industri']) ? $company['industri'] : 'Industri tidak tersedia'; ?></p>
+                        <p><strong>Lokasi:</strong> <?= !empty($company['lokasi_perusahaan']) ? $company['lokasi_perusahaan'] : 'Lokasi tidak tersedia'; ?></p>
+                        <p><strong>Deskripsi:</strong></p>
+                        <p><?= !empty($company['deskripsi_perusahaan']) ? nl2br($company['deskripsi_perusahaan']) : 'Tidak ada deskripsi.'; ?></p>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
+
+        </div>
+
+
 
 <!-- Daftar Pekerjaan di Perusahaan -->
 <div class="container my-4">

@@ -26,7 +26,7 @@ if (isset($_GET['id_pekerjaan']) && intval($_GET['id_pekerjaan'])) {
     u.foto_profil  -- Ambil foto profil dari tabel pengguna
   FROM pekerjaan p
   JOIN perusahaan c ON p.id_perusahaan = c.id_perusahaan
-  LEFT JOIN pengguna u ON u.id_pengguna = c.id_perusahaan  -- Join dengan tabel pengguna untuk mendapatkan foto profil
+LEFT JOIN pengguna u ON u.id_pengguna = c.id_pengguna  -- Sesuaikan hubungan perusahaan dengan pengguna
   WHERE p.id_pekerjaan = ?";
 
 
@@ -53,7 +53,7 @@ if (isset($_GET['id_pekerjaan']) && intval($_GET['id_pekerjaan'])) {
 
 <head>
     <meta charset="utf-8">
-    <title>PencariKerja_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -81,16 +81,36 @@ body {
             background-color: #f4f4f9;
         }
         
-/* Tombol Pekerjaan Sesuai dengan Tema */
 .btn-primary {
-    background-color: #6A9C89; /* Warna tombol sesuai tema */
-    border-color: #6A9C89; /* Warna border tombol */
+    background-color: #6A9C89; 
+    border-color: #6A9C89; 
 }
 
 .btn-primary:hover {
-    background-color: #5b876f; /* Warna tombol saat hover */
-    border-color: #5b876f; /* Warna border saat hover */
+    background-color: #5b876f;
+    border-color: #5b876f; 
 }
+.job-item {
+    background-color: #ffffff; 
+    border-radius: 15px; 
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease; 
+}
+
+.job-item:hover {
+    transform: translateY(-5px); 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+    border-radius: 20px; 
+}
+
+.job-item img {
+    transition: transform 0.3s ease; 
+}
+
+
+.job-item:hover img {
+    transform: scale(1.05); 
+}
+
         </style>
 <body>
     <div class="container-xxl bg-white p-0">
@@ -179,14 +199,14 @@ body {
         <div class="col-md-4">
             <div class="job-item p-4 border rounded" style="background-color: #ffffff; border-radius: 15px;">
                 <h4>Profil Perusahaan</h4>
-                <div class="d-flex align-items-center mb-3">
-                    <!-- Menampilkan foto profil perusahaan -->
-                    <?php if (!empty($job['foto_profil'])): ?>
-                        <img src="../foto/<?= htmlspecialchars($job['foto_profil']); ?>" class="img-fluid" style="max-width: 150px; max-height: 150px; border-radius: 50%;">
-                    <?php else: ?>
-                        <img src="../imgbk/default.png" class="img-fluid" style="max-width: 150px; max-height: 150px; border-radius: 50%;">
-                    <?php endif; ?>
-                </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <!-- Menampilkan foto profil perusahaan -->
+                        <?php if (!empty($job['foto_profil'])): ?>
+                            <img src="../foto/<?= htmlspecialchars($job['foto_profil']); ?>" class="img-fluid rounded" style="max-width: 150px; max-height: 150px; border-radius: 50%;">
+                        <?php else: ?>
+                            <img src="../imgbk/default_logo.png" class="img-fluid rounded" style="max-width: 150px; max-height: 150px; border-radius: 50%;">
+                        <?php endif; ?>
+                    </div>
                 <p><strong>Nama Perusahaan:</strong> <?= htmlspecialchars($job['nama_perusahaan']); ?></p>
                 <p><strong>Lokasi Perusahaan:</strong> <?= htmlspecialchars($job['lokasi_perusahaan']); ?></p>
                 <p><strong>Deskripsi:</strong> <?= nl2br(htmlspecialchars($job['deskripsi_perusahaan'])); ?></p>

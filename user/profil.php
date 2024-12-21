@@ -50,7 +50,7 @@ $keterampilan = $query_keterampilan->get_result();
 
 <head>
     <meta charset="utf-8">
-    <title>PencariKerja_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -77,101 +77,119 @@ $keterampilan = $query_keterampilan->get_result();
             font-family: 'Heebo', sans-serif;
             background-color: #f4f4f9;
         }
-
-h1 {
-        color: #16423C;
-        font-size: 2.5rem;
-        text-align: center;
-        margin-top: 30px;
-        font-weight: bold;
-    }
-    .profile {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-
-    .profile img {
-        border-radius: 50%;
-        border: 4px solid #6A9C89;
-        width: 150px;
-        height: 150px;
-        object-fit: cover;
-        margin-bottom: 20px;
-    }
-    .profile p {
-        font-size: 1.2rem;
-        margin: 10px 0;
-    }
-
-    .profile p strong {
-        color: #16423C;
-        font-weight: bold;
-    }
-    h2 {
-        color: #16423C;
-        font-size: 1.8rem;
-        display: inline-block;
-        margin-top: 30px;
-        margin-bottom: 10px;
-        border-bottom: 2px solid #6A9C89;
-        padding-bottom: 10px;
-    }
-    .kelola-link {
-        float: right;
-        font-size: 0.9rem;
-        margin-top: 10px;
-    }
-
-    .kelola-link a {
-        color: #6A9C89;
-        text-decoration: none;
-    }
-
-    .kelola-link a:hover {
-        color: #333;
-    }
-   /* Edit Profil Button */
-   .edit-link {
-        text-align: center;
-        font-size: 0.9rem;
-        margin-bottom: 10px;
-    }
-
-    .edit-link a {
-        color: #6A9C89;
-        text-decoration: none;
-    }
-
-    .edit-link a:hover {
-        color: #333;
-    }
-
-
-.profil-list ul {
-    list-style-type: none;
-    padding: 0;
-    font-size: 1.1rem;
-}
-
-.profil-list ul li {
-    background-color: #f9f9f9;
-    margin-bottom: 15px;
-    padding: 15px;
+        .section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease;
+
 }
 
-.profil ul li:hover {
+h1 {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+h2 {
+    color: #333;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+    .profile {
+        display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-img img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    margin-right: 20px;
+}
+.profile-info p {
+    margin: 8px 0;
+    font-size: 16px;
+}
+
+.profile-info strong {
+        color: #16423C;
+    }
+
+    .edit-link {
+    text-align: center;
+    margin-top: 10px;
+}
+.btn-edit {
+    display: inline-block;
+    padding: 10px 20px;
     background-color: #6A9C89;
-    color: #fff;
-    cursor: pointer;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
 }
 
+.btn-edit:hover {
+    background-color: #333;
+    }
+   /* Edit Profil Button */
+   .kelola-link a {
+    color: #6A9C89;
+    text-decoration: none;
+    font-size: 14px;
+}
 
+.kelola-link a:hover {
+    text-decoration: underline;
+}
 
-</style>
+/* List Styles */
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
 
-    
+ul li {
+    margin: 8px 0;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.section:hover {
+    transform: translateY(-5px); 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+    border-radius: 12px; 
+}
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+
+    .profile {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .profile-info {
+        margin-top: 15px;
+    }
+
+    .profile-img img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .section {
+        padding: 15px;
+    }
+}
+ 
     </style>
 
 <body>
@@ -221,25 +239,30 @@ h1 {
         <!-- Navbar End -->
 
 
-        <body>
+<body>
     <div class="container">
         <h1>Profil Pengguna</h1>
-         <!-- Profil Section -->
-         <div class="profile">
-            <img src="<?= $user['foto_profil'] ? '../foto/' . $user['foto_profil'] : ''; ?>" alt="Foto Profil">
-            <p><strong>Nama:</strong> <?= htmlspecialchars($user['nama']); ?></p>
-            <p><strong>Email:</strong> <?= htmlspecialchars($user['email']); ?></p>
-            <p><strong>Username:</strong> <?= htmlspecialchars($user['username']); ?></p>
-            <p><strong>Peran:</strong> <?= htmlspecialchars($user['peran']); ?></p>
-        </div>
-
-        <!-- Edit Profil Link -->
-        <div class="edit-link">
-            <a href="update_profile.php">Edit Profil</a>
+        
+        <!-- Profil Section -->
+        <div class="section profile-container">
+            <div class="profile">
+                <div class="profile-img">
+                    <img src="<?= $user['foto_profil'] ? '../foto/' . $user['foto_profil'] : 'default.jpg'; ?>" alt="Foto Profil">
+                </div>
+                <div class="profile-info">
+                    <p><strong>Nama:</strong> <?= htmlspecialchars($user['nama']); ?></p>
+                    <p><strong>Email:</strong> <?= htmlspecialchars($user['email']); ?></p>
+                    <p><strong>Username:</strong> <?= htmlspecialchars($user['username']); ?></p>
+                    <p><strong>Peran:</strong> <?= htmlspecialchars($user['peran']); ?></p>
+                </div>
+            </div>
+            <div class="edit-link">
+                <a href="update_profile.php" class="btn-edit">Edit Profil</a>
+            </div>
         </div>
 
         <!-- Pendidikan Section -->
-        <div class="pendidikan">
+        <div class="section pendidikan-container">
             <h2>Pendidikan</h2>
             <span class="kelola-link"><a href="education.php">Kelola Pendidikan</a></span>
             <ul>
@@ -250,7 +273,7 @@ h1 {
         </div>
 
         <!-- Pengalaman Section -->
-        <div class="pengalaman">
+        <div class="section pengalaman-container">
             <h2>Pengalaman</h2>
             <span class="kelola-link"><a href="experience.php">Kelola Pengalaman</a></span>
             <ul>
@@ -261,7 +284,7 @@ h1 {
         </div>
 
         <!-- Keterampilan Section -->
-        <div class="keterampilan">
+        <div class="section keterampilan-container">
             <h2>Keterampilan</h2>
             <span class="kelola-link"><a href="skills.php">Kelola Keterampilan</a></span>
             <ul>
@@ -271,7 +294,8 @@ h1 {
             </ul>
         </div>
     </div>
-    </div>
+</body>
+
 
 
         <!-- Footer  -->

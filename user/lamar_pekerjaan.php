@@ -60,7 +60,7 @@ $judul_pekerjaan = $pekerjaan['judul_pekerjaan'];
 
 <head>
     <meta charset="utf-8">
-    <title>PencariKerja_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">

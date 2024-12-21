@@ -2,17 +2,26 @@
 session_start(); // Memulai sesi
 
 // Konfigurasi database
-$host = 'localhost';
-$dbname = 'lookwork2';
-$username = 'root';
-$password = '';
+
+// Database connection settings
+$server = "wstif23.myhost.id";
+$user = "wstifmy1_kelas_int";
+$password = "@Polije164Int";
+$nama_database = "wstifmy1_int_team3";
 
 try {
-    // Membuat koneksi database menggunakan PDO
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // Create a new PDO connection
+    $conn = new PDO("mysql:host=$server;dbname=$nama_database", $user, $password);
+    
+    // Set the PDO error mode to exception
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+    // Optionally, test if the connection is successful
+    // echo "Connected successfully";
 } catch (PDOException $e) {
-    die("Koneksi gagal: " . $e->getMessage());
+    // Handle connection error
+    echo "Connection failed: " . $e->getMessage();
+    exit;
 }
 
 // Pastikan pengguna yang melihat adalah perusahaan
@@ -57,7 +66,7 @@ $educations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <head>
     <meta charset="utf-8">
-    <title>Perusahaan_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">

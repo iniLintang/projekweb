@@ -180,16 +180,16 @@ a:hover {
 /* Styling label agar lebih menarik */
 .register-form label {
     font-weight: bold;
-    color: #333333; /* Warna default yang lebih netral */
+    color: #333333; 
     margin-bottom: 8px;
-    display: block; /* Membuat label berada di atas input */
-    font-size: 14px; /* Ukuran font label lebih kecil */
+    display: block; 
+    font-size: 14px; 
     transition: color 0.3s ease;
 }
 
 /* Warna label saat input fokus */
 .register-form .form-control:focus + label {
-    color: #6A9C89; /* Ubah warna label menjadi hijau lembut ketika input fokus */
+    color: #6A9C89; 
 }
 
 /* Tombol Register */
@@ -202,7 +202,7 @@ a:hover {
     color: #ffffff;
     transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
     border-radius: 10px;
-    width: 100%; /* Agar tombol lebar penuh di dalam form */
+    width: 100%; 
 }
 
 .register-form .btn:hover {

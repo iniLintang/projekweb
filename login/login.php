@@ -2,61 +2,67 @@
 session_start();
 
 // Konfigurasi database
-$host = "localhost"; 
-$username_db = "root"; 
-$password_db = ""; 
-$database = "lookwork2"; 
+$server = "wstif23.myhost.id";
+$user = "wstifmy1_kelas_int";
+$password = "@Polije164Int";
+$nama_database = "wstifmy1_int_team3";
 
-// Membuat koneksi ke database
-$conn = new mysqli($host, $username_db, $password_db, $database);
+// Buat koneksi
+$db = new mysqli($server, $user, $password, $nama_database);
 
 // Memeriksa koneksi
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
+if ($db->connect_error) {
+    die("Koneksi gagal: " . $db->connect_error);
 }
 
 // Menangani proses login saat form disubmit
+$error = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
     // Mencegah SQL Injection dengan menggunakan prepared statements
-    $stmt = $conn->prepare("SELECT * FROM pengguna WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $db->prepare("SELECT * FROM pengguna WHERE email = ?");
+    if ($stmt) {
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    // Memeriksa apakah email ditemukan
-    if ($result->num_rows == 1) {
-        $row = $result->fetch_assoc();
+        // Memeriksa apakah email ditemukan
+        if ($result->num_rows == 1) {
+            $row = $result->fetch_assoc();
 
-        // Memverifikasi password yang di-hash
-        if (password_verify($password, $row['kata_sandi'])) {
-            // Set session variables
-            $_SESSION['pengguna_id'] = $row['id_pengguna'];
-            $_SESSION['email'] = $row['email'];
-            $_SESSION['username'] = $row['username'];
-            $_SESSION['peran'] = $row['peran'];
+            // Memverifikasi password yang di-hash
+            if (password_verify($password, $row['kata_sandi'])) {
+                // Set session variables
+                $_SESSION['pengguna_id'] = $row['id_pengguna'];
+                $_SESSION['email'] = $row['email'];
+                $_SESSION['username'] = $row['username'];
+                $_SESSION['peran'] = $row['peran'];
 
-            // Redirect sesuai dengan peran
-            if ($row['peran'] == 'pencari_kerja') {
-                header("Location: ../user/indexx.php"); 
-            } elseif ($row['peran'] == 'perusahaan') {
-                header("Location: ../perusahaan/index.php");
-            } elseif ($row['peran'] == 'admin') {
-                header("Location: ../admin/index.php");
+                // Redirect sesuai dengan peran
+                if ($row['peran'] == 'pencari_kerja') {
+                    header("Location: ../user/indexx.php");
+                } elseif ($row['peran'] == 'perusahaan') {
+                    header("Location: ../Perusahaan/index.php");
+                } elseif ($row['peran'] == 'admin') {
+                    header("Location: ../admin/index.php");
+                }
+                exit();
+            } else {
+                $error = "Password salah!";
             }
-            exit();
         } else {
-            $error = "Password salah!";
+            $error = "Email tidak ditemukan!";
         }
-    } else {
-        $error = "Email tidak ditemukan!";
-    }
 
-    $stmt->close();
+        $stmt->close();
+    } else {
+        $error = "Terjadi kesalahan pada server.";
+    }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">

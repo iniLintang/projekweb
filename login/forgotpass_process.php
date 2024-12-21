@@ -61,70 +61,78 @@ class ForgotPassword {
                 $mail->isHTML(true);
                 $mail->Subject = 'Permintaan Reset Password';
                 $mail->Body = "
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <style>
-                        body {
-                            font-family: Arial, sans-serif;
-                            margin: 0;
-                            padding: 0;
-                            background-color: #f4f4f4;
-                            color: #333;
-                        }
-                        .email-container {
-                            max-width: 600px;
-                            margin: 20px auto;
-                            background-color: #ffffff;
-                            border: 1px solid #ddd;
-                            border-radius: 8px;
-                            overflow: hidden;
-                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                        }
-                        .email-header {
-                            background-color: #004d00; /* Hijau Gelap */
-                            color: #ffffff;
-                            padding: 20px;
-                            text-align: center;
-                        }
-                        .email-body {
-                            padding: 20px;
-                            line-height: 1.6;
-                            color: #004d00; /* Hijau Gelap */
-                        }
-                        .email-footer {
-                            background-color: #e6ffe6; /* Hijau Terang */
-                            color: #666;
-                            padding: 15px;
-                            text-align: center;
-                            font-size: 14px;
-                        }
-                        .reset-button {
-                            display: inline-block;
-                            padding: 10px 20px;
-                            margin-top: 20px;
-                            background-color: #008000; /* Hijau */
-                            color: white;
-                            text-decoration: none;
-                            border-radius: 5px;
-                            font-weight: bold;
-                            border: 2px solid #004d00; /* Hijau Gelap */
-                        }
-                        .reset-button:hover {
-                            background-color: #004d00; /* Hijau Gelap */
-                            color: #ffffff;
-                        }
-                    </style>
-                </head>
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .email-header {
+            background-color: #6A9C89; 
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        .email-body {
+            padding: 20px;
+            line-height: 1.6;
+            color: #16423C; 
+            text-align: justify;
+        }
+        .email-body p {
+            margin: 10px 0;
+        }
+        .email-footer {
+            background-color: #e6ffe6; 
+            color: #666;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .reset-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #6A9C89; 
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            border: 2px solid #4C7B6B; 
+        }
+        .reset-button:hover {
+            background-color: #4C7B6B; 
+            color: #ffffff;
+        }
+        .center {
+            text-align: center;
+        }
+    </style>
+</head>
                 <body>
                     <div class='email-container'>
                         <div class='email-header'>
                             <h1>Reset Password</h1>
                         </div>
                         <div class='email-body'>
-                            <p>Hai,</p>
+                            <p class='center' style='text-align: center;'>Hai!</p>
                             <p>Kami menerima permintaan untuk mereset password akun Anda. Jika ini adalah permintaan Anda, silakan klik tombol di bawah untuk melanjutkan:</p>
-                            <a href='$reset_url' class='reset-button' center>Reset Password</a>
+                            <div class='center' style='text-align: center;'>
+                           <a href='$reset_url' class='reset-button' center>Reset Password</a>
                             <p>Jika Anda tidak meminta pengaturan ulang password, abaikan email ini.</p>
                         </div>
                         <div class='email-footer'>

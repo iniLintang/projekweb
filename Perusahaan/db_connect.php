@@ -1,11 +1,13 @@
 <?php
 // Koneksi ke database
-$host = 'localhost'; // Ganti dengan host Anda
-$dbname = 'lookwork2'; // Ganti dengan nama database Anda
-$username = 'root'; // Ganti dengan username Anda
-$password = ''; // Ganti dengan password Anda
+$server = "wstif23.myhost.id";
+$user = "wstifmy1_kelas_int";
+$password = "@Polije164Int";
+$nama_database = "wstifmy1_int_team3";
 
-$conn = new mysqli($host, $username, $password, $dbname);
+
+// Buat koneksi
+$conn = new mysqli($server, $user, $password, $nama_database);
 
 // Check for connection error
 if ($conn->connect_error) {

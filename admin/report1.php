@@ -1,30 +1,32 @@
 <?php
 include('db.php');
 session_start();
+
 // Filter berdasarkan rentang waktu
 $start_date = isset($_POST['start_date']) ? $_POST['start_date'] : '';
 $end_date = isset($_POST['end_date']) ? $_POST['end_date'] : '';
 
-// Query untuk laporan
+// Query untuk laporan berdasarkan lokasi pekerjaan dan jumlah lowongan
 $sql = "SELECT 
-            perusahaan.nama_perusahaan, 
-            perusahaan.lokasi_perusahaan,
-            COUNT(pekerjaan.id_pekerjaan) AS total_lowongan,
-            SUM(CASE WHEN pekerjaan.jenis_pekerjaan = 'Full-time' THEN 1 ELSE 0 END) AS full_time,
-            SUM(CASE WHEN pekerjaan.jenis_pekerjaan = 'Part-time' THEN 1 ELSE 0 END) AS part_time,
-            SUM(CASE WHEN pekerjaan.jenis_pekerjaan = 'Contract' THEN 1 ELSE 0 END) AS contract,
-            SUM(CASE WHEN pekerjaan.jenis_pekerjaan = 'Internship' THEN 1 ELSE 0 END) AS internship
-        FROM perusahaan
-        LEFT JOIN pekerjaan ON perusahaan.id_perusahaan = pekerjaan.id_perusahaan
+            pekerjaan.lokasi AS lokasi_pekerjaan,
+            COUNT(pekerjaan.id_pekerjaan) AS total_lowongan
+        FROM pekerjaan
         WHERE 1=1";
 
 // Menambahkan filter berdasarkan rentang waktu
 if (!empty($start_date) && !empty($end_date)) {
-    $sql .= " AND pekerjaan.tanggal_posting BETWEEN '$start_date' AND '$end_date'";
+    $sql .= " AND pekerjaan.tanggal_posting BETWEEN ? AND ?";
 }
 
-$sql .= " GROUP BY perusahaan.id_perusahaan";
-$result = $conn->query($sql);
+$sql .= " GROUP BY pekerjaan.lokasi";
+
+// Menggunakan prepared statement untuk keamanan
+$stmt = $conn->prepare($sql);
+if (!empty($start_date) && !empty($end_date)) {
+    $stmt->bind_param('ss', $start_date, $end_date);
+}
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 
@@ -34,7 +36,7 @@ $result = $conn->query($sql);
 
 <head>
     <meta charset="utf-8">
-    <title>Perusahaan_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -121,7 +123,7 @@ $result = $conn->query($sql);
     </nav>
 
     <!-- Judul -->
-    <h1 class="text-center my-4">Laporan Pekerjaan Per Perusahaan</h1>
+    <h1 class="text-center my-4">Laporan Pekerjaan Per Lokasi</h1>
 
     <!-- Form Filter (Container dengan lebar tengah) -->
 <div class="container" style="max-width: 600px;">
@@ -150,85 +152,78 @@ $result = $conn->query($sql);
 
     <!-- Tabel Laporan -->
     <table class="table table-bordered mt-4" id="data-table">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama Perusahaan</th>
-                <th>Total Lowongan</th>
-                <th>Full-time</th>
-                <th>Part-time</th>
-                <th>Contract</th>
-                <th>Internship</th>
-                <th>Lokasi Perusahaan</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $no = 1; // Inisialisasi nomor urut
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    echo '<tr>
-                        <td>' . $no++ . '</td> <!-- Menampilkan nomor urut -->
-                        <td>' . htmlspecialchars($row['nama_perusahaan']) . '</td>
-                        <td>' . htmlspecialchars($row['total_lowongan']) . '</td>
-                        <td>' . htmlspecialchars($row['full_time']) . '</td>
-                        <td>' . htmlspecialchars($row['part_time']) . '</td>
-                        <td>' . htmlspecialchars($row['contract']) . '</td>
-                        <td>' . htmlspecialchars($row['internship']) . '</td>
-                        <td>' . htmlspecialchars($row['lokasi_perusahaan']) . '</td>
-                    </tr>';
-                }
-            } else {
-                echo '<tr><td colspan="8" class="text-center">Data Not Found</td></tr>';
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Lokasi Perusahaan</th>
+            <th>Total Lowongan</th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php
+        $no = 1; // Inisialisasi nomor urut
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                echo '<tr>
+                    <td>' . $no++ . '</td> <!-- Menampilkan nomor urut -->
+                    <td>' . htmlspecialchars($row['lokasi_pekerjaan']) . '</td>
+                    <td>' . htmlspecialchars($row['total_lowongan']) . '</td>
+                </tr>';
             }
-            ?>
-        </tbody>
-    </table>
+        } else {
+            echo '<tr><td colspan="3" class="text-center">Data Not Found</td></tr>';
+        }
+        ?>
+    </tbody>
+</table>
+
 </body>
 
 
    
-    <script>
-        document.getElementById('export_pdf').addEventListener('click', function () {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+<script>
+    document.getElementById('export_pdf').addEventListener('click', function () {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
 
-            // Menambahkan judul
-            doc.setFontSize(18);
-            doc.text('Laporan Lowongan Kerja per Perusahaan', 105, 10, null, null, 'center');
+        // Menambahkan judul
+        doc.setFontSize(18);
+        doc.text('Laporan Lowongan Kerja per Lokasi', 105, 10, null, null, 'center');
 
-            
-            const tableColumn = ['Nama Perusahaan', 'Total Lowongan', 'Full-time', 'Part-time', 'Contract', 'Internship', 'Lokasi Perusahaan'];
-            const tableRows = [];
+        const tableColumn = ['Lokasi Pekerjaan', 'Total Lowongan'];
+        const tableRows = [];
 
-            const rows = document.querySelectorAll('#data-table tbody tr');
-            rows.forEach((row) => {
-                const rowData = [];
-                row.querySelectorAll('td').forEach((cell) => {
+        const rows = document.querySelectorAll('#data-table tbody tr');
+        rows.forEach((row) => {
+            const rowData = [];
+            row.querySelectorAll('td').forEach((cell, index) => {
+                if (index > 0) { // Mengabaikan kolom nomor
                     rowData.push(cell.innerText);
-                });
-                tableRows.push(rowData);
+                }
             });
-
-            doc.autoTable({
-                head: [tableColumn],
-                body: tableRows,
-                startY: 20,
-            });
-
-            doc.save('laporan_lowongan.pdf');
+            tableRows.push(rowData);
         });
 
-        document.getElementById('print_report').addEventListener('click', function () {
-            var printContent = document.querySelector('.p-4').innerHTML;
-            var originalContent = document.body.innerHTML;
-
-            document.body.innerHTML = printContent;
-            window.print();
-            document.body.innerHTML = originalContent;
-            window.location.reload();
+        doc.autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 20,
         });
-    </script>
+
+        doc.save('laporan_lowongan.pdf');
+    });
+
+    document.getElementById('print_report').addEventListener('click', function () {
+        var printContent = document.querySelector('.p-4').innerHTML;
+        var originalContent = document.body.innerHTML;
+
+        document.body.innerHTML = printContent;
+        window.print();
+        document.body.innerHTML = originalContent;
+        window.location.reload();
+    });
+</script>
+
 <script src="../assets/js/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js" integrity="sha512-sW/w8s4RWTdFFSduOTGtk4isV1+190E/GghVffMA9XczdJ2MDzSzLEubKAs5h0wzgSJOQTRYyaz73L3d6RtJSg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="../assets/js/bootstrap.bundle.min.js"></script>

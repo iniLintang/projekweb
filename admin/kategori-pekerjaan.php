@@ -79,10 +79,9 @@ $result = $stmt->get_result();
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
-    <title>Pengguna_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -97,77 +96,71 @@ $result = $stmt->get_result();
     <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-
 </head>
-
 <style>
     body {
-        font-family: 'Heebo', sans-serif;
-        background-color: #f4f4f9;
+            font-family: 'Heebo', sans-serif;
+            background-color: #f4f4f9;
     }
 
     .table {
-        width: 90%;
-        margin: 0 auto;
+    width: 90%; /* Menetapkan lebar tabel menjadi 90% dari lebar kontainer */
+    margin: 0 auto; /* Menjadikan tabel terpusat di tengah */
+}
+@media (max-width: 1200px) {
+    .table {
+        width: 85%; /* Lebar tabel lebih kecil untuk layar yang lebih kecil */
     }
-
-    @media (max-width: 1200px) {
-        .table {
-            width: 85%;
+}
+.btn {
+            background-color: #6A9C89;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
         }
-    }
-
-    .btn {
-        background-color: #6A9C89;
-        border: none;
-        color: white;
-        border-radius: 5px;
-        padding: 10px 20px;
-        font-size: 14px;
-        cursor: pointer;
-    }
-</style>
+    </style>
 
 <body>
-
-    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-        <a href="index.php" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
-            <h1 class="m-0" style="color: #16423C;">LookWork</h1>
-        </a>
-        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
+        <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+       <a href="index.php" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
+       <h1 class="m-0" style="color: #16423C;">LookWork</h1>
+       </a>
+            <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">              
             <div class="navbar-nav ms-auto p-4 p-lg-0">
-                <a href="index.php" class="nav-item nav-link">Beranda</a>
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link active dropdown-toggle" data-bs-toggle="dropdown">Manajemen Data</a>
-                    <div class="dropdown-menu rounded-0 m-0">
-                        <a href="data-pekerjaan.php" class="dropdown-item">Pekerjaan</a>
-                        <a href="data-perusahaan.php" class="dropdown-item">Perusahaan</a>
-                        <a href="data-user.php" class="dropdown-item">Pengguna</a>
-                        <a href="kategori-pekerjaan.php" class="dropdown-item">Kategori Pekerjaan</a>
+                    <a href="index.php" class="nav-item nav-link ">Beranda</a>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link active dropdown-toggle" data-bs-toggle="dropdown">Manajemen Data</a>
+                        <div class="dropdown-menu rounded-0 m-0">
+                            <a href="data-pekerjaan.php" class="dropdown-item">Pekerjaan</a>
+                            <a href="data-perusahaan.php" class="dropdown-item">Perusahaan</a>
+                            <a href="data-user.php" class="dropdown-item">Pengguna</a>
+                            <a href="kategori-pekerjaan.php" class="dropdown-item">Kategori Pekerjaan</a>
+                        </div>
                     </div>
-                </div>
-                <div class="nav-item dropdown">
+                    <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Laporan</a>
                     <div class="dropdown-menu rounded-0 m-0">
                         <a href="report1.php" class="dropdown-item">Pekerjaan</a>
                         <a href="report2.php" class="dropdown-item">Perusahaan</a>
                         <a href="report3.php" class="dropdown-item">Pengguna</a>
                     </div>
-                </div>
+                    </div>
 
                 <div class="dropdown">
-                    <a href="#" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block dropdown-toggle" style="background-color: #6A9C89; border-color: #6A9C89;" data-bs-toggle="dropdown"></a>
+                    <a href="#" class="btn btn-primary rounded-0 py-4 px-lg-5 d-none d-lg-block dropdown-toggle" style="background-color: #6A9C89; border-color: #6A9C89;" data-bs-toggle="dropdown">
+                    </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="logout.php">Keluar</a></li>
                     </ul>
                 </div>
-            </div>
-        </div>
-    </nav>
+        </nav>
+    </div>  
    <!-- Judul Data Pengguna -->
    <h1 class="text-center my-4">Data Kategori</h1>
 <!-- Form Pencarian dan Tombol Tambah Kategori -->
@@ -295,5 +288,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+<script src="../assets/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/wow/wow.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="js/main.js"></script>
 </body>
+
 </html>

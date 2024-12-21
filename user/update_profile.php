@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo "Gagal memperbarui profil.";
         }
     } else {
-        echo $upload_error;
+        echo "<script>alert('$upload_error');</script>";  // Menampilkan alert dengan pesan error
     }
 }
 
@@ -74,14 +74,12 @@ $query->bind_param("i", $id_pengguna);
 $query->execute();
 $user = $query->get_result()->fetch_assoc();
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title>PencariKerja_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -219,37 +217,29 @@ $user = $query->get_result()->fetch_assoc();
         </nav>
         <!-- Navbar End -->
 
-    <div class="container">
+        <div class="container">
         <h1>Edit Profil</h1>
-        <form action="update_profile.php" method="POST" enctype="multipart/form-data">
-    <div class="form-group">
-        <label for="nama">Nama:</label>
-        <input type="text" id="nama" name="nama" value="<?= htmlspecialchars($user['nama']); ?>" placeholder="Masukkan nama lengkap" required>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="nama">Nama:</label>
+                <input type="text" id="nama" name="nama" value="<?= htmlspecialchars($user['nama']) ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['username']) ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="foto_profil">Foto Profil:</label>
+                <input type="file" id="foto_profil" name="foto_profil">
+            </div>
+            <button type="submit">Simpan Perubahan</button>
+        </form>
     </div>
 
-    <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']); ?>" placeholder="Masukkan email" required>
-    </div>
-
-    <div class="form-group">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['username']); ?>" placeholder="Masukkan username" required>
-    </div>
-
-    <div class="form-group">
-        <label for="foto_profil">Foto Profil:</label>
-        <input type="file" id="foto_profil" name="foto_profil" accept="image/*">
-    </div>
-
-    <?php if (!empty($user['foto_profil'])): ?>
-        <div>
-            <img src="<?= htmlspecialchars($user['foto_profil']); ?>" alt="Foto Profil" style="max-width: 100px; max-height: 100px;">
-        </div>
-    <?php endif; ?>
-
-    <button type="submit">Simpan Perubahan</button>
-</form>
 
     </div>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>

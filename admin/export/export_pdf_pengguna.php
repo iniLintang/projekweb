@@ -7,10 +7,9 @@ class PDF extends FPDF
     // Header untuk laporan
     function Header()
     {
-        // Set background color hijau muda untuk header
-        $this->SetFillColor(70, 130, 70); // Warna hijau
         $this->SetFont('Arial', 'B', 14);
-        $this->Cell(0, 10, 'Laporan Pengguna Berdasarkan Peran', 0, 1, 'C', true); // Mengubah judul sesuai dengan data yang ditampilkan
+        $this->SetTextColor(0, 0, 0); // Warna teks hitam
+        $this->Cell(0, 10, 'Laporan Pengguna Berdasarkan Peran', 0, 1, 'C'); // Judul di tengah, tanpa background
         $this->Ln(5);
     }
 
@@ -19,7 +18,7 @@ class PDF extends FPDF
     {
         $this->SetY(-15);
         $this->SetFont('Arial', 'I', 8);
-        $this->SetTextColor(0, 128, 0); // Warna teks hijau
+        $this->SetTextColor(0, 0, 0); // Warna teks hitam
         $this->Cell(0, 10, 'Halaman ' . $this->PageNo(), 0, 0, 'C');
     }
 }
@@ -29,16 +28,24 @@ $pdf = new PDF();
 $pdf->AddPage();
 $pdf->SetFont('Arial', '', 12);
 
-// Set warna untuk tabel header (Hijau Tua)
-$pdf->SetFillColor(34, 139, 34); // Warna hijau tua
-$pdf->SetTextColor(255, 255, 255); // Teks putih untuk header tabel
+// Tentukan lebar tabel
+$tabel_width = 140; // Lebar total tabel (90 + 50)
 
-// Tambahkan header tabel dengan warna hijau
-$pdf->Cell(90, 10, 'Peran Pengguna', 1, 0, 'C', true); // Menyesuaikan dengan peran pengguna
-$pdf->Cell(50, 10, 'Jumlah Pengguna', 1, 1, 'C', true); // Menyesuaikan dengan jumlah pengguna
+// Hitung posisi X untuk menempatkan tabel di tengah halaman
+$page_width = $pdf->GetPageWidth();
+$x = ($page_width - $tabel_width) / 2;
+$pdf->SetX($x);
 
-// Set warna teks normal (hitam)
-$pdf->SetTextColor(0, 0, 0); 
+// Set warna untuk header tabel
+$pdf->SetFillColor(200, 200, 200); // Warna abu-abu muda untuk background header tabel
+$pdf->SetTextColor(0, 0, 0); // Teks hitam untuk header tabel
+
+// Tambahkan header tabel dengan background abu-abu muda, rata tengah
+$pdf->Cell(90, 10, 'Peran Pengguna', 1, 0, 'C', true);
+$pdf->Cell(50, 10, 'Jumlah Pengguna', 1, 1, 'C', true); // Akhiri baris
+
+// Set warna teks normal (hitam) untuk isi tabel, tanpa background
+$pdf->SetTextColor(0, 0, 0);
 
 // Ambil data dari database
 $sql = "SELECT peran, COUNT(id_pengguna) AS jumlah_pengguna 
@@ -46,16 +53,19 @@ $sql = "SELECT peran, COUNT(id_pengguna) AS jumlah_pengguna
         GROUP BY peran";
 $result = $conn->query($sql);
 
-if ($result->num_rows > 0) {
+if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        // Set warna latar belakang tabel baris
-        $pdf->SetFillColor(144, 238, 144); // Warna hijau muda untuk baris
-        $pdf->Cell(90, 10, $row['peran'], 1, 0, 'C', true); // Menampilkan peran pengguna
-        $pdf->Cell(50, 10, $row['jumlah_pengguna'], 1, 1, 'C', true); // Menampilkan jumlah pengguna
+        // Set posisi X untuk isi tabel di tengah
+        $pdf->SetX($x);
+        // Tambahkan isi tabel
+        $pdf->Cell(90, 10, htmlspecialchars($row['peran']), 1, 0, 'C');
+        $pdf->Cell(50, 10, htmlspecialchars($row['jumlah_pengguna']), 1, 1, 'C');
     }
 } else {
+    // Set posisi X untuk pesan 'Tidak ada data' di tengah
+    $pdf->SetX($x);
     // Jika tidak ada data
-    $pdf->Cell(190, 10, 'Tidak ada data ditemukan', 1, 1, 'C');
+    $pdf->Cell(140, 10, 'Tidak ada data ditemukan', 1, 1, 'C');
 }
 
 // Output PDF ke browser

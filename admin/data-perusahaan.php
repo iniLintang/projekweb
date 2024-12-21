@@ -25,7 +25,8 @@ $industriResult = $conn->query("SELECT DISTINCT industri FROM perusahaan");
 
 // Query dasar untuk menampilkan data perusahaan berdasarkan pencarian
 $sql = "SELECT perusahaan.*, 
-               pengguna.email, 
+               pengguna.email,
+               pengguna.foto_profil, 
                pengguna.tanggal_dibuat, 
                COUNT(pekerjaan.id_pekerjaan) AS total_lowongan
         FROM perusahaan 
@@ -91,7 +92,7 @@ $result = $stmt->get_result();
 
 <head>
     <meta charset="utf-8">
-    <title>Perusahaan_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -108,10 +109,6 @@ $result = $stmt->get_result();
     <link href="css/style.css" rel="stylesheet">
 </head>
 <style>
-    body {
-            font-family: 'Heebo', sans-serif;
-            background-color: #f4f4f9;
-    }
     body {
             font-family: 'Heebo', sans-serif;
             background-color: #f4f4f9;
@@ -137,9 +134,7 @@ $result = $stmt->get_result();
         }
     </style>
 
-    <body>
-
-
+<body>
         <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
        <a href="index.php" class="navbar-brand d-flex align-items-center text-center py-0 px-4 px-lg-5">
        <h1 class="m-0" style="color: #16423C;">LookWork</h1>
@@ -149,7 +144,7 @@ $result = $stmt->get_result();
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">              
             <div class="navbar-nav ms-auto p-4 p-lg-0">
-                    <a href="index.php" class="nav-item  nav-link ">Beranda</a>
+                    <a href="index.php" class="nav-item nav-link ">Beranda</a>
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link active dropdown-toggle" data-bs-toggle="dropdown">Manajemen Data</a>
                         <div class="dropdown-menu rounded-0 m-0">
@@ -176,7 +171,7 @@ $result = $stmt->get_result();
                     </ul>
                 </div>
         </nav>
-    </div> 
+    </div>  
 <!-- Judul Data Perusahaan -->
 <h1 class="text-center my-4">Data Perusahaan</h1> <!-- Tambahkan judul di sini -->
 
@@ -221,6 +216,7 @@ $result = $stmt->get_result();
         <tr>
             <th>No</th> <!-- Kolom nomor ditambahkan di sini -->
             <th>ID Perusahaan</th>
+            <th>Foto Perusahaan</th>
             <th>Nama Perusahaan</th>
             <th>Deskripsi Perusahaan</th>
             <th>Lokasi Perusahaan</th>
@@ -238,6 +234,14 @@ $result = $stmt->get_result();
                 <tr>
                     <td><?php echo $no++; ?></td> <!-- Menampilkan nomor urut -->
                     <td><?php echo htmlspecialchars($row['id_perusahaan']); ?></td>
+                    <td>
+                        <?php if (isset($row['foto_profil']) && !empty($row['foto_profil']) && file_exists("../foto/" . $row['foto_profil'])): ?>
+                            <img src="../foto/<?= htmlspecialchars($row['foto_profil']); ?>" alt="Foto Profil" class="img-fluid" style="max-width: 100px; height: auto;">
+                        <?php else: ?>
+                            <img src="../imgbk/default_logo.png" alt="Default Foto Profil" class="img-fluid" style="max-width: 100px; height: auto;">
+                        <?php endif; ?>
+                    </td>
+
                     <td><?php echo htmlspecialchars($row['nama_perusahaan']); ?></td>
                     <td><?php echo htmlspecialchars($row['deskripsi_perusahaan']); ?></td>
                     <td><?php echo htmlspecialchars($row['lokasi_perusahaan']); ?></td>

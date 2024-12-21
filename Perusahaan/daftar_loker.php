@@ -8,12 +8,14 @@ if (!isset($_SESSION['peran']) || $_SESSION['peran'] !== 'perusahaan') {
 }
 
 // Koneksi ke database
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "lookwork2";
+$server = "wstif23.myhost.id";
+$user = "wstifmy1_kelas_int";
+$password = "@Polije164Int";
+$nama_database = "wstifmy1_int_team3";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Buat koneksi
+$conn = new mysqli($server, $user, $password, $nama_database);
 
 // Cek koneksi
 if ($conn->connect_error) {
@@ -65,7 +67,7 @@ $result = $stmt->get_result();
 
 <head>
     <meta charset="utf-8">
-    <title>Perusahaan_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">

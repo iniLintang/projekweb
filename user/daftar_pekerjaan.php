@@ -22,7 +22,7 @@ if (!$result) {
 
 <head>
     <meta charset="utf-8">
-    <title>PencariKerja_LookWork</title>
+    <title>LookWork</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -48,57 +48,53 @@ if (!$result) {
             font-family: 'Heebo', sans-serif;
             background-color: #f4f4f9;
         }
-/* Warna Tab */
 .nav-pills .nav-item .nav-link.active {
-    background-color: #6A9C89; /* Sesuaikan warna seperti yang diinginkan */
+    background-color: #6A9C89; 
     color: white;
-    border-bottom: 3px solid #4A745F; /* Menambahkan efek border bawah */
+    border-bottom: 3px solid #4A745F; 
 }
 
 .nav-pills .nav-item .nav-link {
-    color: #6A9C89; /* Warna tab non-active */
+    color: #6A9C89; 
     border-bottom: 3px solid transparent;
 }
 
 .nav-pills .nav-item .nav-link:hover {
-    color: #4A745F; /* Warna saat hover pada tab */
+    color: #4A745F; 
 }
 
-/* Smooth Border Radius dan Efek Hover pada job-item */
 .job-item {
-    background-color: #ffffff; /* Warna background putih */
-    border-radius: 10px; /* Membuat sudut sedikit membulat */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Menambahkan bayangan untuk efek kedalaman */
-    padding: 20px; /* Menambahkan jarak di dalam box */
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease; /* Animasi saat hover */
+    background-color: #ffffff; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    padding: 20px; 
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease; 
 }
 
 .job-item:hover {
-    transform: translateY(-5px); /* Efek naik sedikit saat dihover */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Memperkuat bayangan saat hover */
-    border-radius: 12px; /* Menambahkan efek pembulatan lebih besar saat hover */
+    transform: translateY(-5px); 
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+    border-radius: 12px; 
 }
 
-/* Tombol Pekerjaan Sesuai dengan Tema */
 .btn-primary {
-    background-color: #6A9C89; /* Warna tombol sesuai tema */
-    border-color: #6A9C89; /* Warna border tombol */
+    background-color: #6A9C89; 
+    border-color: #6A9C89; 
 }
 
 .btn-primary:hover {
-    background-color: #5b876f; /* Warna tombol saat hover */
-    border-color: #5b876f; /* Warna border saat hover */
+    background-color: #5b876f; 
+    border-color: #5b876f; 
 }
 
 .btn-primary:focus, .btn-primary:active {
-    background-color: #4f725d; /* Warna tombol saat fokus atau aktif */
-    border-color: #4f725d;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Memperkuat bayangan saat hover */
+    background-color: #4f725d; 
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
 }
     
     .tab-class {
         border-radius: 10px;
-        padding: 20px; /* Jarak di dalam container utama */
+        padding: 20px; 
     }
 
     .tab-content {
@@ -304,21 +300,6 @@ $result = $conn->query($query);
                 <div class="col-md-6 mb-4">
                 <div class="job-item p-4 border rounded shadow-sm d-flex flex-column justify-content-between" style="height: 250px;">
                         
-                        <!-- Company Logo -->
-                        <div class="me-3">
-                        <?php if (!empty($pengguna['foto_profil'])): ?>
-                            <img src="../foto/<?= htmlspecialchars($pengguna['foto_profil']); ?>" 
-                                class="img-fluid rounded-circle" 
-                                style="width: 50px; height: 50px; object-fit: cover;" 
-                                alt="Foto Profil Pengguna">
-                        <?php else: ?>
-                            <img src="../imgbk/default.png" 
-                                class="img-fluid rounded-circle" 
-                                style="width: 50px; height: 50px; object-fit: cover;" 
-                                alt="Default Logo">
-                        <?php endif; ?>
-                    </div>
-
 
                         <!-- Job Description -->
                         <div>

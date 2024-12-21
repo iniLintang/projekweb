@@ -2,6 +2,23 @@
 // Koneksi database
 include('db.php'); // Pastikan file ini benar-benar ada dan terkoneksi dengan database Anda
 session_start();
+
+if (!isset($_SESSION['peran'])) {
+    // Redirect ke halaman login jika belum login
+    header("Location: login.php");
+    exit();
+}
+
+// Periksa apakah pengguna adalah admin
+if ($_SESSION['peran'] !== 'admin') {
+    // Jika bukan admin, redirect ke halaman lain atau tampilkan pesan
+    echo "<script>
+            alert('Anda tidak memiliki akses ke halaman ini!');
+            window.location.href = 'index.php'; // Redirect ke halaman utama atau halaman lain
+          </script>";
+    exit();
+}
+
 // Query 1: Jumlah lowongan aktif
 $sql_jobs = "SELECT COUNT(*) AS jumlah_pekerjaan FROM pekerjaan WHERE tipe_kerja = 'Aktif'";
 $result_jobs = $conn->query($sql_jobs);
@@ -71,25 +88,29 @@ $result_companies = $conn->query($sql_companies);
     }
     .panel-card {
         transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-        border-radius: 10px; /* Membuat sudut lebih bulat untuk tampilan modern */
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Bayangan halus */
+        border-radius: 10px; 
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
     }
 
     .panel-card:hover {
-        transform: translateY(-10px); /* Panel sedikit terangkat ke atas */
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Menambahkan bayangan lebih tebal saat hover */
-        background-color: #f8f9fa; /* Menambahkan perubahan warna latar belakang pada hover */
+        transform: translateY(-10px); 
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
+        background-color: #f8f9fa; 
     }
     .table-container {
-    max-width: 80%; /* Membatasi lebar tabel */
-    margin: 0 auto; /* Memusatkan tabel di tengah */
+    max-width: 80%; 
+    margin: 0 auto; 
 }
 .table {
-    width: 100%; /* Pastikan tabel mengambil lebar maksimal dari container-nya */
+    width: 100%;
 }
 
+    .chart-container {
+        max-width: 300px; 
+        margin: 0 auto;   
+    }
+</style>
 
-            </style>
 <body>
     <div class="container-xxl bg-white p-0">
         <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
@@ -225,23 +246,30 @@ $jumlah_pengguna = $row_pengguna['jumlah_pengguna'];
 
 <div class="col-md-12">
     <h3 class="text-center">Distribusi Jumlah Lowongan, Pengguna, dan Perusahaan</h3>
-    <div class="row">
+    <div class="row justify-content-center"> <!-- Pusatkan diagram -->
         <!-- Diagram Lingkaran Lowongan -->
         <div class="col-md-4">
-            <canvas id="lowonganPieChart" width="400" height="400"></canvas>
+            <div class="chart-container">
+                <canvas id="lowonganPieChart" width="400" height="400"></canvas>
+            </div>
         </div>
 
         <!-- Diagram Lingkaran Pengguna -->
         <div class="col-md-4">
-            <canvas id="penggunaPieChart" width="400" height="400"></canvas>
+            <div class="chart-container">
+                <canvas id="penggunaPieChart" width="400" height="400"></canvas>
+            </div>
         </div>
 
         <!-- Diagram Lingkaran Perusahaan -->
         <div class="col-md-4">
-            <canvas id="perusahaanPieChart" width="400" height="400"></canvas>
+            <div class="chart-container">
+                <canvas id="perusahaanPieChart" width="400" height="400"></canvas>
+            </div>
         </div>
     </div>
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Menambahkan Chart.js -->
 
